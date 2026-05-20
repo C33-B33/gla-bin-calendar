@@ -15,16 +15,26 @@ from bs4 import BeautifulSoup
 import re
 from datetime import datetime, timedelta
 
-# Hide default Streamlit developer chrome (hamburger menu, footer, and sneaky watermark)
+# The absolute kitchen sink CSS override to attempt nuking the cloud badge
 st.markdown("""
     <style>
-    #MainMenu {visibility: hidden;}
-    footer {visibility: hidden;}
-    header {visibility: hidden;}
-    div[data-testid="stDecoration"] {display: none;}
-    div[data-testid="stStatusWidget"] {display: none;}
-    div[class^="viewerBadge"] {display: none !important;}
-    a[href*="streamlit.io"] {display: none !important;}
+    #MainMenu {visibility: hidden !important;}
+    footer {visibility: hidden !important;}
+    header {visibility: hidden !important;}
+    div[data-testid="stDecoration"] {display: none !important;}
+    div[data-testid="stStatusWidget"] {display: none !important;}
+    
+    /* Target variations of the viewer badge element names */
+    div[class^="viewerBadge"] {display: none !important; visibility: hidden !important;}
+    span[class^="viewerBadge"] {display: none !important; visibility: hidden !important;}
+    button[class^="viewerBadge"] {display: none !important; visibility: hidden !important;}
+    
+    /* Target potential iframe cloud injections */
+    iframe[title="Managed Hosting Badge"] {display: none !important; visibility: hidden !important;}
+    iframe[src*="streamlit.io"] {display: none !important;}
+    
+    /* Target link fallbacks */
+    a[href*="streamlit.io"] {display: none !important; visibility: hidden !important;}
     </style>
 """, unsafe_allow_html=True)
 
