@@ -193,15 +193,15 @@ def generate_fridge_magnet_pdf(collections_list, address_label, uprn_label):
             <div class="matrix-table">
                 <div class="matrix-row"><div class="matrix-header-cell" style="background-color: #007BFF;">🟦 BLUE BIN — Paper & Cardboard Recycling</div></div>
                 <div class="matrix-body-row">
-                    <div class="matrix-cell-yes"><div class="list-title-yes">✅ YES (LOOSE ONLY):</div><ul class="matrix-list"><li>Newspapers & magazines</li><li>Envelopes & shredded paper</li><li>Cardboard packs & boxes</li><li>Clean pizza boxes & egg cartons</li></ul></div>
-                    <div class="matrix-cell-no"><div class="list-title-no">❌ NO:</div><ul class="matrix-list"><li>Plastic bags or wrapping films</li><li>Items with food or liquids</li><li>Padded Jiffy envelopes</li><li>Disposable coffee cups</li></ul></div>
+                    <div class="matrix-cell-yes"><div class="list-title-yes">✅ YES (LOOSE ONLY):</div><ul class="matrix-list"><li>Newspapers & magazines</li><li>Envelopes (with or without plastic windows)</li><li>Cardboard packs & boxes</li><li>Clean pizza boxes & egg cartons</li></ul></div>
+                    <div class="matrix-cell-no"><div class="list-title-no">❌ NO:</div><ul class="matrix-list"><li>Plastic bags or wrapping films</li><li>Items with food or liquids</li><li>Shredded paper (confetti size)</li><li>Disposable coffee cups</li></ul></div>
                 </div>
             </div>
             <div class="matrix-table">
                 <div class="matrix-row"><div class="matrix-header-cell" style="background-color: #6C757D;">🩶 GREY BIN — Mixed Recycling (Plastics & Metals)</div></div>
                 <div class="matrix-body-row">
                     <div class="matrix-cell-yes"><div class="list-title-yes">✅ YES (RINSED CLEAN):</div><ul class="matrix-list"><li>Plastic bottles, pots, tubs & trays</li><li>Food tins & drink cans</li><li>Aluminium foil & clean trays</li><li>Food cartons (Tetra Pak)</li></ul></div>
-                    <div class="matrix-cell-no"><div class="list-title-no">❌ NO:</div><ul class="matrix-list"><li>Glass bottles or jars</li><li>Polystyrene inserts</li><li>Batteries or active device modules</li><li>Metal cooking pots or pans</li></ul></div>
+                    <div class="matrix-cell-no"><div class="list-title-no">❌ NO:</div><ul class="matrix-list"><li>Glass bottles or jars</li><li>Polystyrene inserts</li><li>Soft plastics, shopping bags, or wrappers</li><li>Metal cooking pots or pans</li></ul></div>
                 </div>
             </div>
             <div class="matrix-table">
@@ -340,24 +340,33 @@ if query_uprn and query_address:
                 # --- PHASE 3: COUNCIL WASTE CHEAT SHEET MATRIX ---
                 st.divider()
                 st.markdown("### 📋 What Goes in Which Bin?")
-                st.write("Official material classification breakdown sourced from Glasgow City Council.")
+                
+                # NATIVE LIVE GCC COMPLIANCE DISCLAIMER SHIELD
+                st.warning(
+                    "⚠️ **The 'Council Likes To Change Its Mind' Disclaimer:** Look, the big wigs at George Square "
+                    "love to shift the recycling rules almost as often as the Glasgow weather changes. While this cheat sheet "
+                    "is tracking the latest rules for the new Grey Bin rollout and Blue Paper tracks, the machinery at the processing "
+                    "plant gets updated all the time. To save yourself from getting a red 'sticker of shame' slapped onto your bin lid "
+                    "by a grumpy collection crew, double-check the absolute live source criteria here: "
+                    "[Official Glasgow City Council Bin Sorting Guidelines](https://www.glasgow.gov.uk/article/13729/What-goes-in-your-bin)"
+                )
                 
                 tab_green, tab_blue, tab_grey, tab_brown, tab_purple = st.tabs([
                     "🟩 Manky Stuff", "🟦 Clean Paper", "🩶 Mixed Plastics", "🟫 Leftover Scran", "🟪 Ginger Bottles"
                 ])
                 
                 with tab_green:
-                    st.markdown('<div style="background-color: #FFFFFF; color: #1E293B; padding: 18px; border-radius: 14px; border: 1px solid #E2E8F0;"><h4 style="color: #28A745; margin-top:0;">🟩 Manky Stuff: General Waste (Non-Recyclable)</h4><div style="display: flex; flex-wrap: wrap; gap: 16px;"><div style="flex: 1; min-width: 200px;"><strong style="color: #16A34A;">✅ YES:</strong><ul style="font-size: 13px; padding-left: 20px; color: #475569;"><li>Disposable nappies & wipes</li><li>Pet waste & cat litter</li><li>Polystyrene & bubble wrap</li><li>Tissues & used kitchen towels</li><li>Wallpaper & grease-stained card</li></ul></div><div style="flex: 1; min-width: 200px;"><strong style="color: #DC2626;">❌ NO:</strong><ul style="font-size: 13px; padding-left: 20px; color: #475569;"><li>Standard clean recyclables</li><li>Electrical gear & cables</li><li>Batteries (Severe fire risk!)</li><li>Soil, bricks, rubble or stones</li></ul></div></div></div>', unsafe_allow_html=True)
+                    st.markdown('<div style="background-color: #FFFFFF; color: #1E293B; padding: 18px; border-radius: 14px; border: 1px solid #E2E8F0;"><h4 style="color: #28A745; margin-top:0;">🟩 Manky Stuff: General Waste (Non-Recyclable)</h4><div style="display: flex; flex-wrap: wrap; gap: 16px;"><div style="flex: 1; min-width: 200px;"><strong style="color: #16A34A;">✅ YES:</strong><ul style="font-size: 13px; padding-left: 20px; color: #475569;"><li>Disposable nappies & wipes</li><li>Pet waste & cat litter</li><li>Polystyrene & bubble wrap</li><li>Tissues & used kitchen towels</li><li>Wallpaper & grease-stained card</li><li>**Shredded paper** & packaging soft film plastics</li></ul></div><div style="flex: 1; min-width: 200px;"><strong style="color: #DC2626;">❌ NO:</strong><ul style="font-size: 13px; padding-left: 20px; color: #475569;"><li>Standard clean recyclables</li><li>Electrical gear & cables</li><li>Batteries (Severe fire risk!)</li><li>Soil, bricks, rubble or stones</li></ul></div></div></div>', unsafe_allow_html=True)
                 with tab_blue:
-                    st.markdown('<div style="background-color: #FFFFFF; color: #1E293B; padding: 18px; border-radius: 14px; border: 1px solid #E2E8F0;"><h4 style="color: #007BFF; margin-top:0;">🟦 Clean Paper & Cardboard</h4><div style="display: flex; flex-wrap: wrap; gap: 16px;"><div style="flex: 1; min-width: 200px;"><strong style="color: #16A34A;">✅ YES (Loose, no plastic bags):</strong><ul style="font-size: 13px; padding-left: 20px; color: #475569;"><li>Newspapers, magazines & junk mail</li><li>Envelopes & shredded paper pieces</li><li>Cardboard delivery packages & cereal boxes</li><li>Clean pizza boxes & egg cartons</li><li>Paperback books & wrapping sheets</li></ul></div><div style="flex: 1; min-width: 200px;"><strong style="color: #DC2626;">❌ NO:</strong><ul style="font-size: 13px; padding-left: 20px; color: #475569;"><li>Items caked in old takeaway grease or liquids (give them a quick rinse, don\'t be lazy)</li><li>Plastic box liners or wrappers</li><li>Padded envelopes (Jiffy wraps)</li><li>Paper coffee cups & tissues</li><li>Hardback books</li></ul></div></div></div>', unsafe_allow_html=True)
+                    st.markdown('<div style="background-color: #FFFFFF; color: #1E293B; padding: 18px; border-radius: 14px; border: 1px solid #E2E8F0;"><h4 style="color: #007BFF; margin-top:0;">🟦 Clean Paper & Cardboard</h4><div style="display: flex; flex-wrap: wrap; gap: 16px;"><div style="flex: 1; min-width: 200px;"><strong style="color: #16A34A;">✅ YES (Loose, no plastic bags):</strong><ul style="font-size: 13px; padding-left: 20px; color: #475569;"><li>Newspapers, magazines & junk mail</li><li>Envelopes with or without plastic windows</li><li>Cardboard delivery packages & cereal boxes</li><li>Clean pizza boxes & egg cartons</li><li>Paperback books & wrapping sheets</li></ul></div><div style="flex: 1; min-width: 200px;"><strong style="color: #DC2626;">❌ NO:</strong><ul style="font-size: 13px; padding-left: 20px; color: #475569;"><li>Items caked in old takeaway grease or liquids</li><li>Plastic box liners or wrappers</li><li>**Shredded paper** (Confetti escapes the sorter belts!)</li><li>Paper coffee cups & tissues</li><li>Hardback books</li></ul></div></div></div>', unsafe_allow_html=True)
                 with tab_grey:
-                    st.markdown('<div style="background-color: #FFFFFF; color: #1E293B; padding: 18px; border-radius: 14px; border: 1px solid #E2E8F0;"><h4 style="color: #6C757D; margin-top:0;">🩶 Mixed Plastics & Tins</h4><div style="display: flex; flex-wrap: wrap; gap: 16px;"><div style="flex: 1; min-width: 200px;"><strong style="color: #16A34A;">✅ YES:</strong><ul style="font-size: 13px; padding-left: 20px; color: #475569;"><li>Plastic bottles, pots, tubs & food trays</li><li>Food tins, drink cans & empty aerosols</li><li>Clean aluminium foil packaging sheets</li><li>Juice/milk cartons (Tetra Pak)</li><li>Soft plastics (Carrier bags, film lids)</li></ul></div><div style="flex: 1; min-width: 200px;"><strong style="color: #DC2626;">❌ NO:</strong><ul style="font-size: 13px; padding-left: 20px; color: #475569;"><li>Glass bottles or product jars</li><li>Polystyrene blocks</li><li>Batteries or electronic elements</li><li>Metal pots, cooking pans or baking trays</li><li>Nappies</li></ul></div></div></div>', unsafe_allow_html=True)
+                    st.markdown('<div style="background-color: #FFFFFF; color: #1E293B; padding: 18px; border-radius: 14px; border: 1px solid #E2E8F0;"><h4 style="color: #6C757D; margin-top:0;">🩶 Mixed Plastics & Tins</h4><div style="display: flex; flex-wrap: wrap; gap: 16px;"><div style="flex: 1; min-width: 200px;"><strong style="color: #16A34A;">✅ YES:</strong><ul style="font-size: 13px; padding-left: 20px; color: #475569;"><li>Plastic bottles, pots, tubs & food trays</li><li>Food tins, drink cans & empty aerosols</li><li>Clean aluminium foil packaging sheets</li><li>Juice/milk cartons (Tetra Pak)</li></ul></div><div style="flex: 1; min-width: 200px;"><strong style="color: #DC2626;">❌ NO:</strong><ul style="font-size: 13px; padding-left: 20px; color: #475569;"><li>Glass bottles or product jars</li><li>Polystyrene blocks</li><li>Batteries or electronic elements</li><li>**Soft plastics** (Carrier bags, film wraps clog spinning hubs!)</li><li>Nappies</li></ul></div></div></div>', unsafe_allow_html=True)
                 with tab_brown:
                     st.markdown('<div style="background-color: #FFFFFF; color: #1E293B; padding: 18px; border-radius: 14px; border: 1px solid #E2E8F0;"><h4 style="color: #8B4513; margin-top:0;">🟫 Leftover Scran & Garden Waste</h4><div style="display: flex; flex-wrap: wrap; gap: 16px;"><div style="flex: 1; min-width: 200px;"><strong style="color: #16A34A;">✅ YES:</strong><ul style="font-size: 13px; padding-left: 20px; color: #475569;"><li>Grass clippings, wild weeds & leaves</li><li>Flowers, small branches & twigs</li><li>Meat, fish, bones, dairy & eggs</li><li>Bread, old pastries, fruit & veg scran</li><li>Tea bags & coffee filter grounds</li></ul></div><div style="flex: 1; min-width: 200px;"><strong style="color: #DC2626;">❌ NO:</strong><ul style="font-size: 13px; padding-left: 20px; color: #475569;"><li>Standard plastic trash bags or sacks</li><li>Heavy soil, mud, turf, stones or gravel</li><li>Animal waste or cat litter sheets</li><li>Invasive Japanese Knotweed or Ragwort</li></ul></div></div></div>', unsafe_allow_html=True)
                 with tab_purple:
-                    st.markdown('<div style="background-color: #FFFFFF; color: #1E293B; padding: 18px; border-radius: 14px; border: 1px solid #E2E8F0;"><h4 style="color: #6F42C1; margin-top:0;">🟪 Ginger Bottles (Glass Only)</h4><div style="display: flex; flex-wrap: wrap; gap: 16px;"><div style="flex: 1; min-width: 200px;"><strong style="color: #16A34A;">✅ YES:</strong><ul style="font-size: 13px; padding-left: 20px; color: #475569;"><li>Wine, beer & spirit bottles</li><li>Glass cheques / empty Irn-Bru glass</li><li>Glass food jars (Jam, sauce, coffee)</li><li>*Note: Metal screw caps can stay on, don\'t be daft!*</li></ul></div><div style="flex: 1; min-width: 200px;"><strong style="color: #DC2626;">❌ NO:</strong><ul style="font-size: 13px; padding-left: 20px; color: #475569;"><li>Light bulbs or tubes</li><li>Drinking glasses, dinner plates or ceramic mugs</li><li>Pyrex cookware bake glass</li><li>Window panes or mirrors</li></ul></div></div></div>', unsafe_allow_html=True)
+                    st.markdown('<div style="background-color: #FFFFFF; color: #1E293B; padding: 18px; border-radius: 14px; border: 1px solid #E2E8F0;"><h4 style="color: #6F42C1; margin-top:0;">🟪 Ginger Bottles (Glass Only)</h4><div style="display: flex; flex-wrap: wrap; gap: 16px;"><div style="flex: 1; min-width: 200px;"><strong style="color: #16A34A;">✅ YES:</strong><ul style="font-size: 13px; padding-left: 20px; color: #475569;"><li>Wine, beer & spirit bottles</li><li>Glass cheques / empty Irn-Bru glass</li><li>Glass food jars (Jam, sauce, coffee)</li><li>*Note: Metal screw caps can stay on, don\'t be daft!*</li></ul></div><div style="flex: 1; min-width: 200px;"><strong style="color: #DC2626;">❌ NO:</strong><ul style="font-size: 13px; padding-left: 20px; color: #475569;"><li>Light bulbs or tubes</li><li>Drinking glasses, dinner plates or ceramic mugs</li><li>Pyrex oven cookware bake glass</li><li>Window panes or mirrors</li></ul></div></div></div>', unsafe_allow_html=True)
 
-                # --- UPGRADED INTERACTIVE 20-QUESTION EXAM ENGINE ---
+                # --- INTERACTIVE QUIZ SHUFFLER: AM I GLAIKIT? ---
                 st.write("")
                 with st.expander("🧠 The Great Glaswegian Recycling Exam: Am I Glaikit?"):
                     st.write("Test your wits against the trickiest traps in the city chambers. 3 random questions from our massive item bank—let's see if you're an absolute expert or a melt.")
@@ -382,10 +391,10 @@ if query_uprn and query_address:
                             "explanation": "Takeaway cups are bonded with a waterproof polyethylene lining. Standard paper mills can't shred them, so they're destined for the bin fire."
                         },
                         {
-                            "question": "Where do clean plastic grocery bags and bread wrappers go now?",
-                            "options": ["🩶 Grey Bin (The council upgraded the facility)", "🟩 Green Bin (Soft plastics are banned)"],
-                            "correct": "🩶 Grey Bin (The council upgraded the facility)",
-                            "explanation": "Aye! Glasgow's modernized sorting hubs now explicitly accept clean soft plastics and film lids in the grey bin wrapper cycle."
+                            "question": "Where do clean plastic grocery bags and bread wrappers go in Glasgow?",
+                            "options": ["🟩 Green Bin (Soft films clog up the mechanical sorting rollers)", "🩶 Grey Bin (They're clean plastic containers)"],
+                            "correct": "🟩 Green Bin (Soft films clog up the mechanical sorting rollers)",
+                            "explanation": "Unlike some parts of the UK, Glasgow explicitly bans soft plastic films from the grey bin. They wrap around spinning mechanical rotors and bring the facility to a dead stop!"
                         },
                         {
                             "question": "An empty hairspray or deodorant aerosol can?",
@@ -442,10 +451,10 @@ if query_uprn and query_address:
                             "explanation": "Aluminum trays are highly valuable recyclables, but they must be clean. Give it a quick wash—if it's caked in tikka masala, it belongs in the green general waste."
                         },
                         {
-                            "question": "Where should shredded paper from a home office document destroyer go?",
-                            "options": ["🟦 Blue Bin (Loose or tucked inside a paper envelope)", "🟩 Green Bin (The fibers are too short)"],
-                            "correct": "🟦 Blue Bin (Loose or tucked inside a paper envelope)",
-                            "explanation": "Shredded paper is fine for the blue track, but keep it loose or bag it in a larger paper sack so it doesn't blow across the street during collection."
+                            "question": "Where should shredded paper from a home office document destroyer go in Glasgow?",
+                            "options": ["🟩 Green Bin (or your home compost heap)", "🟦 Blue Bin (It's paper pulp confetti)"],
+                            "correct": "🟩 Green Bin (or your home compost heap)",
+                            "explanation": "Because the paper fibers are shredded so small, mechanical screens at the recycling center can't catch them. They blow around like snow and ruin other batches. Keep them out of the blue bin!"
                         },
                         {
                             "question": "Where does a foil pet food pouch go after feeding the cat?",
@@ -481,7 +490,7 @@ if query_uprn and query_address:
                             "question": "Where does bubble wrap from an online delivery parcel go?",
                             "options": ["🟩 Green Bin (Stretchy low-density packaging film)", "🩶 Grey Bin (It's clear clean plastic)"],
                             "correct": "🟩 Green Bin (Stretchy low-density packaging film)",
-                            "explanation": "While soft wrapping films are accepted now, standard industrial bubble wrap is too stringy and clogs the automated sorting rollers. Keep it in the green pile."
+                            "explanation": "While soft packaging wraps are highly debated, heavy bubble wrap is too stringy and clogs up the rotating gears at Blochairn. Keep it in the general trash."
                         }
                     ]
                     
