@@ -15,12 +15,16 @@ from bs4 import BeautifulSoup
 import re
 from datetime import datetime, timedelta
 
-# Hide default Streamlit developer chrome (hamburger menu and footer)
+# Hide default Streamlit developer chrome (hamburger menu, footer, and sneaky watermark)
 st.markdown("""
     <style>
     #MainMenu {visibility: hidden;}
     footer {visibility: hidden;}
     header {visibility: hidden;}
+    div[data-testid="stDecoration"] {display: none;}
+    div[data-testid="stStatusWidget"] {display: none;}
+    div[class^="viewerBadge"] {display: none !important;}
+    a[href*="streamlit.io"] {display: none !important;}
     </style>
 """, unsafe_allow_html=True)
 
