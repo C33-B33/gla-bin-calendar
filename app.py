@@ -520,7 +520,8 @@ else:
     """)
     
     random_placeholder = st.session_state['example_postcode']
-    postcode_input = st.text_input("Stick your postcode in here:", value=random_placeholder).upper().strip()
+    # FIX: Changed 'value=' to 'placeholder=' so it stays empty on load
+    postcode_input = st.text_input("Stick your postcode in here:", placeholder=random_placeholder).upper().strip()
     
     if postcode_input:
         if 'last_postcode' not in st.session_state or st.session_state.get('last_postcode') != postcode_input:
