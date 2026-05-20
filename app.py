@@ -513,7 +513,7 @@ if query_uprn and query_address:
 # --- VIEW B: THE INITIAL SETUP PORTAL ---
 else:
     st.title("Pure Brilliant Bin Finder 🏴󠁧󠁢󠁳󠁣󠁴󠁿")
-    st.caption("🚛 *A dedicated, set-and-forget tracker built exclusively for Glasgow City residents covered by Glasgow City Council.*")
+    st.caption("🚛 *A dedicated, set-and-forget tracker exclusively for Glasgow City residents.*")
     st.markdown("""
     Tired of peeking out the window at midnight to see which color bins the neighbors have dragged to the kerb? Drop your postcode below **one single time**, pick your exact door, and you're set. 
     
