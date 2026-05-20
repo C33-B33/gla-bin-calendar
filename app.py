@@ -402,7 +402,7 @@ if query_uprn and query_address:
 
 # --- VIEW B: THE INITIAL SETUP PORTAL ---
 else:
-    st.title("Glasgow Bin Finder 🤖")
+    st.title("Glasgow Bin Collection Calendar 🤖")
     st.write("Enter your postcode to link your address and generate your customized tracking dashboard.")
     
     random_placeholder = st.session_state['example_postcode']
