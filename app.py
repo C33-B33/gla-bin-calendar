@@ -319,7 +319,6 @@ if query_uprn and query_address:
 
                 primary_color = BIN_STYLES.get(hero_items[0]['type'], {"color": "#475569"})["color"]
 
-                # Fixed hero box layer (always visible, handles dark/light layout)
                 st.markdown(f'<div style="padding: 24px; border-left: 10px solid {primary_color}; border-top: {hero_border}; border-right: {hero_border}; border-bottom: {hero_border}; background: {hero_bg}; border-radius: 16px; margin-bottom: 24px; box-shadow: 0 10px 25px -5px rgba(0,0,0,0.03), 0 8px 10px -6px rgba(0,0,0,0.03);"><span style="font-size: 11px; font-weight: 800; color: #64748B; letter-spacing: 1.5px; text-transform: uppercase;">Next Collection Day</span><p style="margin: 4px 0 16px 0; font-size: 16px; font-weight: 700; color: #334155;">{hero_time}</p>{bins_html}</div>', unsafe_allow_html=True)
                 
                 if future_bins:
@@ -350,24 +349,192 @@ if query_uprn and query_address:
                 with tab_green:
                     st.markdown('<div style="background-color: #FFFFFF; color: #1E293B; padding: 18px; border-radius: 14px; border: 1px solid #E2E8F0;"><h4 style="color: #28A745; margin-top:0;">🟩 Manky Stuff: General Waste (Non-Recyclable)</h4><div style="display: flex; flex-wrap: wrap; gap: 16px;"><div style="flex: 1; min-width: 200px;"><strong style="color: #16A34A;">✅ YES:</strong><ul style="font-size: 13px; padding-left: 20px; color: #475569;"><li>Disposable nappies & wipes</li><li>Pet waste & cat litter</li><li>Polystyrene & bubble wrap</li><li>Tissues & used kitchen towels</li><li>Wallpaper & grease-stained card</li></ul></div><div style="flex: 1; min-width: 200px;"><strong style="color: #DC2626;">❌ NO:</strong><ul style="font-size: 13px; padding-left: 20px; color: #475569;"><li>Standard clean recyclables</li><li>Electrical gear & cables</li><li>Batteries (Severe fire risk!)</li><li>Soil, bricks, rubble or stones</li></ul></div></div></div>', unsafe_allow_html=True)
                 with tab_blue:
-                    st.markdown('<div style="background-color: #FFFFFF; color: #1E293B; padding: 18px; border-radius: 14px; border: 1px solid #E2E8F0;"><h4 style="color: #007BFF; margin-top:0;">🟦 Clean Paper & Cardboard</h4><div style="display: flex; flex-wrap: wrap; gap: 16px;"><div style="flex: 1; min-width: 200px;"><strong style="color: #16A34A;">✅ YES (Loose, no plastic bags):</strong><ul style="font-size: 13px; padding-left: 20px; color: #475569;"><li>Newspapers, magazines & junk mail</li><li>Envelopes & shredded paper pieces</li><li>Cardboard delivery packages & cereal boxes</li><li>Clean pizza boxes & egg cartons</li><li>Paperback books & wrapping sheets</li></ul></div><div style="flex: 1; min-width: 200px;"><strong style="color: #DC2626;">❌ NO:</strong><ul style="font-size: 13px; padding-left: 20px; color: #475569;"><li>Items caked in old takeaway grease or liquids</li><li>Plastic box liners or wrappers</li><li>Padded envelopes (Jiffy wraps)</li><li>Paper coffee cups & tissues</li><li>Hardback books</li></ul></div></div></div>', unsafe_allow_html=True)
+                    st.markdown('<div style="background-color: #FFFFFF; color: #1E293B; padding: 18px; border-radius: 14px; border: 1px solid #E2E8F0;"><h4 style="color: #007BFF; margin-top:0;">🟦 Clean Paper & Cardboard</h4><div style="display: flex; flex-wrap: wrap; gap: 16px;"><div style="flex: 1; min-width: 200px;"><strong style="color: #16A34A;">✅ YES (Loose, no plastic bags):</strong><ul style="font-size: 13px; padding-left: 20px; color: #475569;"><li>Newspapers, magazines & junk mail</li><li>Envelopes & shredded paper pieces</li><li>Cardboard delivery packages & cereal boxes</li><li>Clean pizza boxes & egg cartons</li><li>Paperback books & wrapping sheets</li></ul></div><div style="flex: 1; min-width: 200px;"><strong style="color: #DC2626;">❌ NO:</strong><ul style="font-size: 13px; padding-left: 20px; color: #475569;"><li>Items caked in old takeaway grease or liquids (give them a quick rinse, don\'t be lazy)</li><li>Plastic box liners or wrappers</li><li>Padded envelopes (Jiffy wraps)</li><li>Paper coffee cups & tissues</li><li>Hardback books</li></ul></div></div></div>', unsafe_allow_html=True)
                 with tab_grey:
-                    st.markdown('<div style="background-color: #FFFFFF; color: #1E293B; padding: 18px; border-radius: 14px; border: 1px solid #E2E8F0;"><h4 style="color: #6C757D; margin-top:0;">🩶 Mixed Plastics & Tins</h4><div style="display: flex; flex-wrap: wrap; gap: 16px;"><div style="flex: 1; min-width: 200px;"><strong style="color: #16A34A;">✅ YES (Rinse them first!):</strong><ul style="font-size: 13px; padding-left: 20px; color: #475569;"><li>Plastic bottles, pots, tubs & food trays</li><li>Food tins, drink cans & empty aerosols</li><li>Clean aluminium foil packaging sheets</li><li>Juice/milk cartons (Tetra Pak)</li><li>Soft plastics (Carrier bags, film lids)</li></ul></div><div style="flex: 1; min-width: 200px;"><strong style="color: #DC2626;">❌ NO:</strong><ul style="font-size: 13px; padding-left: 20px; color: #475569;"><li>Glass bottles or product jars</li><li>Polystyrene blocks</li><li>Batteries or electronic elements</li><li>Metal pots, cooking pans or baking trays</li><li>Nappies</li></ul></div></div></div>', unsafe_allow_html=True)
+                    st.markdown('<div style="background-color: #FFFFFF; color: #1E293B; padding: 18px; border-radius: 14px; border: 1px solid #E2E8F0;"><h4 style="color: #6C757D; margin-top:0;">🩶 Mixed Plastics & Tins</h4><div style="display: flex; flex-wrap: wrap; gap: 16px;"><div style="flex: 1; min-width: 200px;"><strong style="color: #16A34A;">✅ YES:</strong><ul style="font-size: 13px; padding-left: 20px; color: #475569;"><li>Plastic bottles, pots, tubs & food trays</li><li>Food tins, drink cans & empty aerosols</li><li>Clean aluminium foil packaging sheets</li><li>Juice/milk cartons (Tetra Pak)</li><li>Soft plastics (Carrier bags, film lids)</li></ul></div><div style="flex: 1; min-width: 200px;"><strong style="color: #DC2626;">❌ NO:</strong><ul style="font-size: 13px; padding-left: 20px; color: #475569;"><li>Glass bottles or product jars</li><li>Polystyrene blocks</li><li>Batteries or electronic elements</li><li>Metal pots, cooking pans or baking trays</li><li>Nappies</li></ul></div></div></div>', unsafe_allow_html=True)
                 with tab_brown:
                     st.markdown('<div style="background-color: #FFFFFF; color: #1E293B; padding: 18px; border-radius: 14px; border: 1px solid #E2E8F0;"><h4 style="color: #8B4513; margin-top:0;">🟫 Leftover Scran & Garden Waste</h4><div style="display: flex; flex-wrap: wrap; gap: 16px;"><div style="flex: 1; min-width: 200px;"><strong style="color: #16A34A;">✅ YES:</strong><ul style="font-size: 13px; padding-left: 20px; color: #475569;"><li>Grass clippings, wild weeds & leaves</li><li>Flowers, small branches & twigs</li><li>Meat, fish, bones, dairy & eggs</li><li>Bread, old pastries, fruit & veg scran</li><li>Tea bags & coffee filter grounds</li></ul></div><div style="flex: 1; min-width: 200px;"><strong style="color: #DC2626;">❌ NO:</strong><ul style="font-size: 13px; padding-left: 20px; color: #475569;"><li>Standard plastic trash bags or sacks</li><li>Heavy soil, mud, turf, stones or gravel</li><li>Animal waste or cat litter sheets</li><li>Invasive Japanese Knotweed or Ragwort</li></ul></div></div></div>', unsafe_allow_html=True)
                 with tab_purple:
-                    st.markdown('<div style="background-color: #FFFFFF; color: #1E293B; padding: 18px; border-radius: 14px; border: 1px solid #E2E8F0;"><h4 style="color: #6F42C1; margin-top:0;">🟪 Ginger Bottles (Glass Only)</h4><div style="display: flex; flex-wrap: wrap; gap: 16px;"><div style="flex: 1; min-width: 200px;"><strong style="color: #16A34A;">✅ YES:</strong><ul style="font-size: 13px; padding-left: 20px; color: #475569;"><li>Wine, beer & spirit bottles</li><li>Glass cheques / empty Irn-Bru glass</li><li>Glass food jars (Jam, sauce, coffee)</li><li>*Note: Metal screw caps can stay on!*</li></ul></div><div style="flex: 1; min-width: 200px;"><strong style="color: #DC2626;">❌ NO:</strong><ul style="font-size: 13px; padding-left: 20px; color: #475569;"><li>Light bulbs or tubes</li><li>Drinking glasses, dinner plates or ceramic mugs</li><li>Pyrex oven cookware bake glass</li><li>Window panes or mirrors</li></ul></div></div></div>', unsafe_allow_html=True)
+                    st.markdown('<div style="background-color: #FFFFFF; color: #1E293B; padding: 18px; border-radius: 14px; border: 1px solid #E2E8F0;"><h4 style="color: #6F42C1; margin-top:0;">🟪 Ginger Bottles (Glass Only)</h4><div style="display: flex; flex-wrap: wrap; gap: 16px;"><div style="flex: 1; min-width: 200px;"><strong style="color: #16A34A;">✅ YES:</strong><ul style="font-size: 13px; padding-left: 20px; color: #475569;"><li>Wine, beer & spirit bottles</li><li>Glass cheques / empty Irn-Bru glass</li><li>Glass food jars (Jam, sauce, coffee)</li><li>*Note: Metal screw caps can stay on, don\'t be daft!*</li></ul></div><div style="flex: 1; min-width: 200px;"><strong style="color: #DC2626;">❌ NO:</strong><ul style="font-size: 13px; padding-left: 20px; color: #475569;"><li>Light bulbs or tubes</li><li>Drinking glasses, dinner plates or ceramic mugs</li><li>Pyrex cookware bake glass</li><li>Window panes or mirrors</li></ul></div></div></div>', unsafe_allow_html=True)
 
-                # --- INTERACTIVE MINI-GAME Component: AM I GLAIKIT? ---
+                # --- UPGRADED INTERACTIVE 20-QUESTION EXAM ENGINE ---
                 st.write("")
-                with st.expander("🧠 Quick Check: Am I Glaikit or a Sorting Master?"):
-                    st.write("Where does an empty, grease-stained pizza box belong?")
-                    choice = st.radio("Pick your answer:", ["Blue Bin (It's cardboard!)", "Green Bin (The grease ruined it!)"])
-                    if st.button("Check Verdict"):
-                        if "Green" in choice:
-                            st.success("👑 Sorting Master! The takeaway grease ruins the paper recycling pulp matrix, so it goes straight in the general trash.")
+                with st.expander("🧠 The Great Glaswegian Recycling Exam: Am I Glaikit?"):
+                    st.write("Test your wits against the trickiest traps in the city chambers. 3 random questions from our massive item bank—let's see if you're an absolute expert or a melt.")
+                    
+                    QUIZ_POOL = [
+                        {
+                            "question": "Where does a greasy, half-eaten takeaway pizza box belong?",
+                            "options": ["🟩 Green Bin (The grease ruined it)", "🟦 Blue Bin (It's cardboard, innit)"],
+                            "correct": "🟩 Green Bin (The grease ruined it)",
+                            "explanation": "Takeaway grease breaks down the paper recycling pulp matrix. Manky cardboard goes straight to the general trash!"
+                        },
+                        {
+                            "question": "What about an empty crisp packet or biscuit wrapper?",
+                            "options": ["🟩 Green Bin (It's a dirty composite)", "🩶 Grey Bin (Looks plastic/foilly)"],
+                            "correct": "🟩 Green Bin (It's a dirty composite)",
+                            "explanation": "Crisp packets are a metallized plastic composite that can't be separated easily. If it fails the 'scrunch test' and pops back open, it's green bin material."
+                        },
+                        {
+                            "question": "Where are you chucking a standard disposable takeaway coffee cup?",
+                            "options": ["🟩 Green Bin (It's secretly lined with plastic)", "🟦 Blue Bin (It feels like paper)"],
+                            "correct": "🟩 Green Bin (It's secretly lined with plastic)",
+                            "explanation": "Takeaway cups are bonded with a waterproof polyethylene lining. Standard paper mills can't shred them, so they're destined for the bin fire."
+                        },
+                        {
+                            "question": "Where do clean plastic grocery bags and bread wrappers go now?",
+                            "options": ["🩶 Grey Bin (The council upgraded the facility)", "🟩 Green Bin (Soft plastics are banned)"],
+                            "correct": "🩶 Grey Bin (The council upgraded the facility)",
+                            "explanation": "Aye! Glasgow's modernized sorting hubs now explicitly accept clean soft plastics and film lids in the grey bin wrapper cycle."
+                        },
+                        {
+                            "question": "An empty hairspray or deodorant aerosol can?",
+                            "options": ["🩶 Grey Bin (It's metal packaging)", "🟩 Green Bin (Looks dangerous)"],
+                            "correct": "🩶 Grey Bin (It's metal packaging)",
+                            "explanation": "As long as it's completely empty and you've popped the plastic lid off, aerosols go right into the grey mixed recycling stream."
+                        },
+                        {
+                            "question": "Where should you chuck an old AA battery from a dead TV remote?",
+                            "options": ["🚫 NEITHER! (Fire hazard, take to a local shop drop)", "🟩 Green Bin (Just bury it in the trash)"],
+                            "correct": "🚫 NEITHER! (Fire hazard, take to a local shop drop)",
+                            "explanation": "Batteries spark huge fires inside the collection lorries and sorting centres. Never throw them in household wheelies—take them to a supermarket or tip drop-box."
+                        },
+                        {
+                            "question": "A smashed Pyrex casserole dish after a total cooking disaster?",
+                            "options": ["🟩 Green Bin (Pyrex melts at a different temperature)", "🟪 Purple Bin (It's glass, right?)"],
+                            "correct": "🟩 Green Bin (Pyrex melts at a different temperature)",
+                            "explanation": "Pyrex is specially treated to withstand heat, meaning it won't melt properly in standard container glass furnaces. Keep it far away from the purple bin!"
+                        },
+                        {
+                            "question": "An envelope from the taxman with the clear little plastic window?",
+                            "options": ["🟦 Blue Bin (The council accepts the windows now)", "🟩 Green Bin (You must rip the plastic out first)"],
+                            "correct": "🟦 Blue Bin (The council accepts the windows now)",
+                            "explanation": "Glasgow's mill screen systems can strain out minor window adhesives automatically. Throw the whole envelope straight into your blue slot."
+                        },
+                        {
+                            "question": "What's the play with plastic bottle tops on clean milk jugs?",
+                            "options": ["🩶 Leave them screwed on tightly", "🚫 Rip them off and toss them loosely"],
+                            "correct": "🩶 Leave them screwed on tightly",
+                            "explanation": "Loose caps are too small for the sorting belts and fall through the cracks into the refuse track. Squash the bottle, screw the cap back on, and throw it in the grey."
+                        },
+                        {
+                            "question": "Where does a cardboard juice or milk carton (Tetra Pak) go?",
+                            "options": ["🩶 Grey Bin (It's classed as a mixed container)", "🟦 Blue Bin (It feels like cardboard)"],
+                            "correct": "🩶 Grey Bin (It's classed as a mixed container)",
+                            "explanation": "Tetra Paks are lined with hidden layers of aluminum and plastic film. Because of this mix, Glasgow processes them alongside plastic and tin containers in the grey bin."
+                        },
+                        {
+                            "question": "A rolls-and-sausage wrapper that's soaking wet with grease from the bakery?",
+                            "options": ["🟩 Green Bin (Contaminated with food oil)", "🟦 Blue Bin (It's raw brown paper)"],
+                            "correct": "🟩 Green Bin (Contaminated with food oil)",
+                            "explanation": "Paper soaked in grease or engine oils cannot be cleaned during processing and ruins the fresh batch of pulp. Put it in the general waste."
+                        },
+                        {
+                            "question": "Where do you get rid of old wallpaper after stripping the spare bedroom?",
+                            "options": ["🟩 Green Bin (The glues and coatings ruin recycling)", "🟦 Blue Bin (It's pure paper rolls)"],
+                            "correct": "🟩 Green Bin (The glues and coatings ruin recycling)",
+                            "explanation": "Wallpaper is covered in synthetic adhesives, water-resistant coatings, and ancient paste. It cannot be converted back into clean paper, so it's general trash."
+                        },
+                        {
+                            "question": "You've finished a foil container of takeaway curry. Where does it go?",
+                            "options": ["🩶 Grey Bin (Only if you've rinsed the sauce out!)", "🟩 Green Bin (Takeaway containers are banned)"],
+                            "correct": "🩶 Grey Bin (Only if you've rinsed the sauce out!)",
+                            "explanation": "Aluminum trays are highly valuable recyclables, but they must be clean. Give it a quick wash—if it's caked in tikka masala, it belongs in the green general waste."
+                        },
+                        {
+                            "question": "Where should shredded paper from a home office document destroyer go?",
+                            "options": ["🟦 Blue Bin (Loose or tucked inside a paper envelope)", "🟩 Green Bin (The fibers are too short)"],
+                            "correct": "🟦 Blue Bin (Loose or tucked inside a paper envelope)",
+                            "explanation": "Shredded paper is fine for the blue track, but keep it loose or bag it in a larger paper sack so it doesn't blow across the street during collection."
+                        },
+                        {
+                            "question": "Where does a foil pet food pouch go after feeding the cat?",
+                            "options": ["🟩 Green Bin (It's a fused composite layer)", "🩶 Grey Bin (It feels like metal foil)"],
+                            "correct": "🟩 Green Bin (It's a fused composite layer)",
+                            "explanation": "Pet pouches are plastic and aluminum melted together into a permanent shield. They cannot be split up by local sorting tracks, so toss them in the green general pile."
+                        },
+                        {
+                            "question": "Where do you dispose of a broken glass mirror or light bulb?",
+                            "options": ["🟩 Green Bin (Bury it safely) or the local tip", "🟪 Purple Bin (It's standard glass)"],
+                            "correct": "🟩 Green Bin (Bury it safely) or the local tip",
+                            "explanation": "Purple bins are exclusively for product *containers* (bottles and jars). Mirrors, window panes, and bulbs contain chemicals and lead that contaminate the batch."
+                        },
+                        {
+                            "question": "A plastic yogurt pot with a foil lid—what's the protocol?",
+                            "options": ["🩶 Grey Bin (Rip the foil lid off completely first)", "🩶 Grey Bin (Leave them attached)"],
+                            "correct": "🩶 Grey Bin (Rip the foil lid off completely first)",
+                            "explanation": "Both parts are recyclable in the grey track, but if the aluminum lid stays attached, the optical scanners read the whole thing as metal and route it incorrectly. Separate them!"
+                        },
+                        {
+                            "question": "Where do you drop off a bundle of dead garden weeds and hedge cuttings?",
+                            "options": ["🟫 Brown Bin (Organic material)", "🟩 Green Bin (Garden soil is trash)"],
+                            "correct": "🟫 Brown Bin (Organic material)",
+                            "explanation": "Hedge twigs, leaves, grass, and pulled weeds are ideal fodder for the city's organic composting facility. Pack them into the brown wheelie."
+                        },
+                        {
+                            "question": "An old tin box that used to hold shortbread or biscuits?",
+                            "options": ["🩶 Grey Bin (It's standard metal storage packaging)", "🟦 Blue Bin (It's for dry storage goods)"],
+                            "correct": "🩶 Grey Bin (It's standard metal storage packaging)",
+                            "explanation": "Metal biscuit tins and sweet tubs are treated exactly like food cans. Make sure it's empty and toss it right into your grey track."
+                        },
+                        {
+                            "question": "Where does bubble wrap from an online delivery parcel go?",
+                            "options": ["🟩 Green Bin (Stretchy low-density packaging film)", "🩶 Grey Bin (It's clear clean plastic)"],
+                            "correct": "🟩 Green Bin (Stretchy low-density packaging film)",
+                            "explanation": "While soft wrapping films are accepted now, standard industrial bubble wrap is too stringy and clogs the automated sorting rollers. Keep it in the green pile."
+                        }
+                    ]
+                    
+                    if 'quiz_set' not in st.session_state:
+                        st.session_state['quiz_set'] = random.sample(QUIZ_POOL, 3)
+                        st.session_state['quiz_evaluated'] = False
+
+                    user_answers = {}
+                    for idx, q in enumerate(st.session_state['quiz_set']):
+                        st.markdown(f"**Q{idx+1}: {q['question']}**")
+                        user_answers[idx] = st.radio(
+                            f"Choose for Q{idx+1}", 
+                            q['options'], 
+                            key=f"quiz_q_{idx}",
+                            label_visibility="collapsed"
+                        )
+                        st.write("")
+
+                    if not st.session_state['quiz_evaluated']:
+                        if st.button("Submit My Exam Paper 📝"):
+                            st.session_state['quiz_evaluated'] = True
+                            st.rerun()
+                    else:
+                        score = 0
+                        for idx, q in enumerate(st.session_state['quiz_set']):
+                            if user_answers[idx] == q['correct']:
+                                score += 1
+                        
+                        st.divider()
+                        st.markdown(f"### Your Score: **{score} / 3**")
+                        
+                        if score == 3:
+                            st.success("👑 **Verdict: Pure Brilliant!** You're a Cleansing Department prodigy. The bin men probably wave at you when they roll down your street. You ken exactly what's what.")
+                        elif score == 2:
+                            st.info("😏 **Verdict: No Bad.** You mostly know your stuff, but you've thrown a wee curveball in there. Room for improvement before you get an honorary high-vis jacket from the Lord Provost.")
+                        elif score == 1:
+                            st.warning("🤨 **Verdict: A Wee Bit Glaikit.** You're trying, bless you, but your back alley must be an absolute tactical disaster area. Give the cheat sheet tabs another read.")
                         else:
-                            st.error("❌ Pure Glaikit! Cardboard soaked in cooking grease can't be recycled—the bin men will give you a dirty look if you slip that into the blue box.")
+                            st.error("💀 **Verdict: Absolute Melt.** Total shambles. You're the exact reason the whole close gets a red warning tag slapped on the bin lids. Step away from the path until you've studied the sorting matrix!")
+                        
+                        with st.expander("👀 See the breakdown of answers"):
+                            for idx, q in enumerate(st.session_state['quiz_set']):
+                                is_correct = user_answers[idx] == q['correct']
+                                status_symbol = "✅" if is_correct else "❌"
+                                st.markdown(f"**Q{idx+1}:** {q['question']}")
+                                st.write(f"{status_symbol} Your pick: {user_answers[idx]}")
+                                st.caption(f"💡 *Why:* {q['explanation']}")
+                                st.write("")
+
+                        if st.button("🔄 Try a Fresh Set of Questions"):
+                            del st.session_state['quiz_set']
+                            del st.session_state['quiz_evaluated']
+                            st.rerun()
 
                 # --- UTILITY PANELS: MISSED BINS & BULK UPLIFTS ---
                 st.write("")
@@ -405,7 +572,7 @@ if query_uprn and query_address:
                 # --- PHASE 5: DIGITAL CALENDAR EXPORT UTILITY ---
                 st.divider()
                 st.write("### 📅 Export to Your Phone Calendar")
-                st.warning("⚠️ **Festive Shambles Warning:** Look, we all know the council loves to do things on the fly when Christmas and New Year roll around. If a collection lands on a bank holiday, they'll cancel it entirely or shift it completely without bothering to update their automated online calendar. This means while this digital export stays completely static doing the regular math, the real-world bin lorry is likely nowhere to be seen. If your phone calendar claims they're rocking up on Boxing Day, the internet is pure giein it laldy with the lies. Make sure to check back on the live dashboard on your phone during festive week before you drag your bins out for nothing!")
+                st.warning("⚠️ **Festive Shambles Warning:** Look, we all know the council loves to do things on the fly when Christmas and New Year roll around. If a collection lands on a bank holiday, they\'ll cancel it entirely or shift it completely without bothering to update their automated online calendar. This means while this digital export stays completely static doing the regular math, the real-world bin lorry is likely nowhere to be seen. If your phone calendar claims they\'re rocking up on Boxing Day, the internet is pure giein it laldy with the lies. Make sure to check back on the live dashboard on your phone during festive week before you drag your bins out for nothing!")
                 
                 duration_months = st.selectbox("Select export timeframe:", options=[1, 3, 6, 12], format_func=lambda x: f"Next {x} Month{'s' if x > 1 else ''}")
                 
