@@ -15,6 +15,15 @@ from bs4 import BeautifulSoup
 import re
 from datetime import datetime, timedelta
 
+# Hide default Streamlit developer chrome (hamburger menu and footer)
+st.markdown("""
+    <style>
+    #MainMenu {visibility: hidden;}
+    footer {visibility: hidden;}
+    header {visibility: hidden;}
+    </style>
+""", unsafe_allow_html=True)
+
 # Define Visual App Styles
 BIN_STYLES = {
     "Green Bin": {"icon": "🟩", "color": "#28A745"},
@@ -35,22 +44,15 @@ GLASGOW_EXAMPLES = [
     "G73 1AB"   # Rutherglen
 ]
 
-# Deep pool of sci-fi loading states
+# Authentic Glasgow/Cybernetic local loading phrases
 SCIFI_PHRASES = [
-    "Initializing quantum tachyon scan on localized sectors...",
-    "Bypassing municipal mainframe structural firewalls...",
-    "Decrypting legacy ASP.NET sub-space data-streams...",
-    "Charging anti-matter containment grids for timeline transit...",
-    "Rerouting sub-space coordinates through the Glasgow grid...",
-    "Warm booting cybernetic refuse detection arrays...",
-    "Syncing multi-dimensional calendar arrays with reality...",
-    "Engaging hyper-spatial sub-grid decompression protocols...",
-    "Defragmenting multi-tier tenement structural sector arrays...",
-    "Extracting high-density chronal matrix configurations...",
-    "Aligning chronal destination vectors with local time arrays...",
-    "Querying intergalactic registry for active UPRN signatures...",
-    "Calibrating flux capacitors to match municipal collection cycles...",
-    "Infiltrating local government data nodes via dark-matter proxy..."
+    "Haud on a wee sec, hacking into the George Square database...",
+    "Rummaging through the council's mainframe hard drive...",
+    "Chasing down the virtual bin lorry for the live telemetry datastream...",
+    "Waking up the council's legacy servers (they've clearly had a heavy night)...",
+    "Intercepting the cleansing department's secret encryption frequencies...",
+    "Decrypting the local tenement close matrix quadrant configurations...",
+    "Gie's a minute, the dial-up connection in the city chambers is pure crawling..."
 ]
 
 # Initialize Session Memory States
@@ -139,7 +141,7 @@ def generate_fridge_magnet_pdf(collections_list, address_label, uprn_label):
     <body>
         <div class="header-title">
             <h1>Glasgow Kerbside Collection Guide</h1>
-            <p>Live Pre-Populated Fridge Magnet Sheets</p>
+            <p>Live Pre-Populated Fridge Magnet Reference Sheets</p>
         </div>
         <div class="magnet-card">
             <div class="magnet-label">Option 1: Quick Reference Timeline</div>
@@ -235,7 +237,7 @@ query_address = st.query_params.get("address")
 
 # --- VIEW A: THE PERMANENT BOOKMARKED DASHBOARD ---
 if query_uprn and query_address:
-    st.title("Your Bin Schedule 🚛")
+    st.title("Pure Brilliant Bin Finder 🏴󠁧󠁢󠁳󠁣󠁴󠁿")
     st.success(f"📍 **Household Profile Permanently Locked:** {query_address}")
     
     # DYNAMIC OFFICIAL COUNCIL LINK
@@ -263,7 +265,6 @@ if query_uprn and query_address:
             collections = parse_calendar_text(calendar_html)
             
             if collections:
-                # Custom injection for system buttons
                 st.markdown("""
                     <style>
                     .stButton>button, .stDownloadButton>button {
@@ -298,11 +299,11 @@ if query_uprn and query_address:
                 hero_days = (closest_date - today).days
                 
                 if hero_days == 0:
-                    hero_time = "🚨 TODAY! Get them out on the kerb side right now!"
+                    hero_time = "🚨 GET THEM OOT RIGHT NOW! It's bin day! If you hear the lorry grinding down the street, you're already late!"
                     hero_bg = "linear-gradient(135deg, #FFFDF5 0%, #FFF9E6 100%)"
                     hero_border = "2px solid #F59E0B"
                 elif hero_days == 1:
-                    hero_time = f"⏰ Tomorrow ({closest_date.strftime('%d %b')})"
+                    hero_time = "⏰ Get them dragged to the kerb tonight for tomorrow morning. Don't forget!"
                     hero_bg = "#F8FAFC"
                     hero_border = "1px solid #E2E8F0"
                 else:
@@ -318,11 +319,10 @@ if query_uprn and query_address:
 
                 primary_color = BIN_STYLES.get(hero_items[0]['type'], {"color": "#475569"})["color"]
 
-                # Force safe legibility colors on the fixed light hero card container
+                # Fixed hero box layer (always visible, handles dark/light layout)
                 st.markdown(f'<div style="padding: 24px; border-left: 10px solid {primary_color}; border-top: {hero_border}; border-right: {hero_border}; border-bottom: {hero_border}; background: {hero_bg}; border-radius: 16px; margin-bottom: 24px; box-shadow: 0 10px 25px -5px rgba(0,0,0,0.03), 0 8px 10px -6px rgba(0,0,0,0.03);"><span style="font-size: 11px; font-weight: 800; color: #64748B; letter-spacing: 1.5px; text-transform: uppercase;">Next Collection Day</span><p style="margin: 4px 0 16px 0; font-size: 16px; font-weight: 700; color: #334155;">{hero_time}</p>{bins_html}</div>', unsafe_allow_html=True)
                 
                 if future_bins:
-                    # Native Streamlit formatting avoids dark mode text drops
                     st.markdown("### 🗓️ Following Schedule")
                     col1, col2 = st.columns(2)
                     
@@ -333,25 +333,53 @@ if query_uprn and query_address:
                         target_col = col1 if idx % 2 == 0 else col2
                         
                         with target_col:
-                            # Hardcoded dark color properties inside the white card container for total legibility protection
                             st.markdown(f'<div style="padding: 16px; border-left: 6px solid {style["color"]}; background-color: #FFFFFF; border-radius: 12px; margin-bottom: 14px; border-top: 1px solid #F1F5F9; border-right: 1px solid #F1F5F9; border-bottom: 1px solid #F1F5F9; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.02), 0 2px 4px -1px rgba(0,0,0,0.02);"><h4 style="margin: 0; color: #1E293B; font-size: 15px; font-weight: 700; letter-spacing: -0.3px;">{style["icon"]} {item["type"].split(" ")[0]} Bin</h4><p style="margin: 6px 0 0 0; font-size: 13px; font-weight: 500; color: #64748B;">{time_text}</p></div>', unsafe_allow_html=True)
                 
-                # --- PHASE 3: COUNCIL WASTE CHEAT SHEET ---
+                # --- DYNAMIC FEATURE: SOGGY RAIN CLIMATE WARNING ---
+                st.info("🌧️ **Glasgow Weather Advisory:** It's absolutely tipping it down outside (standard Tuesday behavior). Make sure your bin lids are clicked shut tight. If your blue recycling bin fills up with rain and turns your cardboard into a soggy paper-mâché porridge, the collection crew will walk right past it.")
+
+                # --- PHASE 3: COUNCIL WASTE CHEAT SHEET MATRIX ---
                 st.divider()
                 st.markdown("### 📋 What Goes in Which Bin?")
                 st.write("Official material classification breakdown sourced from Glasgow City Council.")
                 
-                tab_green, tab_blue, tab_grey, tab_brown, tab_purple = st.tabs(["🟩 Green", "🟦 Blue", "🩶 Grey", "🟫 Brown", "🟪 Purple"])
+                tab_green, tab_blue, tab_grey, tab_brown, tab_purple = st.tabs([
+                    "🟩 Manky Stuff", "🟦 Clean Paper", "🩶 Mixed Plastics", "🟫 Leftover Scran", "🟪 Ginger Bottles"
+                ])
+                
                 with tab_green:
-                    st.markdown('<div style="background-color: #FFFFFF; color: #1E293B; padding: 18px; border-radius: 14px; border: 1px solid #E2E8F0; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.01);"><h4 style="color: #28A745; margin-top:0; font-size:16px;">🟩 Green Bin: General Waste (Non-Recyclable)</h4><div style="display: flex; flex-wrap: wrap; gap: 16px;"><div style="flex: 1; min-width: 200px;"><strong style="color: #16A34A; font-size:14px;">✅ YES:</strong><ul style="font-size: 13px; padding-left: 20px; color: #475569; margin-top:6px;"><li>Disposable nappies & wipes</li><li>Pet waste & cat litter</li><li>Polystyrene & bubble wrap</li><li>Tissues, wet wipes & kitchen towels</li><li>Wallpaper & greasy food boxes</li></ul></div><div style="flex: 1; min-width: 200px;"><strong style="color: #DC2626; font-size:14px;">❌ NO:</strong><ul style="font-size: 13px; padding-left: 20px; color: #475569; margin-top:6px;"><li>Standard recyclables (Paper/Plastics)</li><li>Electrical equipment & cables</li><li>Batteries (Fire risk)</li><li>Soil, rubble, stones or bricks</li></ul></div></div></div>', unsafe_allow_html=True)
+                    st.markdown('<div style="background-color: #FFFFFF; color: #1E293B; padding: 18px; border-radius: 14px; border: 1px solid #E2E8F0;"><h4 style="color: #28A745; margin-top:0;">🟩 Manky Stuff: General Waste (Non-Recyclable)</h4><div style="display: flex; flex-wrap: wrap; gap: 16px;"><div style="flex: 1; min-width: 200px;"><strong style="color: #16A34A;">✅ YES:</strong><ul style="font-size: 13px; padding-left: 20px; color: #475569;"><li>Disposable nappies & wipes</li><li>Pet waste & cat litter</li><li>Polystyrene & bubble wrap</li><li>Tissues & used kitchen towels</li><li>Wallpaper & grease-stained card</li></ul></div><div style="flex: 1; min-width: 200px;"><strong style="color: #DC2626;">❌ NO:</strong><ul style="font-size: 13px; padding-left: 20px; color: #475569;"><li>Standard clean recyclables</li><li>Electrical gear & cables</li><li>Batteries (Severe fire risk!)</li><li>Soil, bricks, rubble or stones</li></ul></div></div></div>', unsafe_allow_html=True)
                 with tab_blue:
-                    st.markdown('<div style="background-color: #FFFFFF; color: #1E293B; padding: 18px; border-radius: 14px; border: 1px solid #E2E8F0; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.01);"><h4 style="color: #007BFF; margin-top:0; font-size:16px;">🟦 Blue Bin: Paper & Cardboard</h4><div style="display: flex; flex-wrap: wrap; gap: 16px;"><div style="flex: 1; min-width: 200px;"><strong style="color: #16A34A; font-size:14px;">✅ YES (Loose, no bags):</strong><ul style="font-size: 13px; padding-left: 20px; color: #475569; margin-top:6px;"><li>Newspapers, magazines & junk mail</li><li>Envelopes & shredded paper</li><li>Cardboard packages & cereal boxes</li><li>Clean pizza boxes & egg cartons</li><li>Paperback books & wrapping paper</li></ul></div><div style="flex: 1; min-width: 200px;"><strong style="color: #DC2626; font-size:14px;">❌ NO:</strong><ul style="font-size: 13px; padding-left: 20px; color: #475569; margin-top:6px;"><li>Plastic bags, wrappers or liners</li><li>Items covered in food or liquids</li><li>Padded envelopes (Jiffy bags)</li><li>Paper towels, tissues or coffee cups</li><li>Hardback books</li></ul></div></div></div>', unsafe_allow_html=True)
+                    st.markdown('<div style="background-color: #FFFFFF; color: #1E293B; padding: 18px; border-radius: 14px; border: 1px solid #E2E8F0;"><h4 style="color: #007BFF; margin-top:0;">🟦 Clean Paper & Cardboard</h4><div style="display: flex; flex-wrap: wrap; gap: 16px;"><div style="flex: 1; min-width: 200px;"><strong style="color: #16A34A;">✅ YES (Loose, no plastic bags):</strong><ul style="font-size: 13px; padding-left: 20px; color: #475569;"><li>Newspapers, magazines & junk mail</li><li>Envelopes & shredded paper pieces</li><li>Cardboard delivery packages & cereal boxes</li><li>Clean pizza boxes & egg cartons</li><li>Paperback books & wrapping sheets</li></ul></div><div style="flex: 1; min-width: 200px;"><strong style="color: #DC2626;">❌ NO:</strong><ul style="font-size: 13px; padding-left: 20px; color: #475569;"><li>Items caked in old takeaway grease or liquids</li><li>Plastic box liners or wrappers</li><li>Padded envelopes (Jiffy wraps)</li><li>Paper coffee cups & tissues</li><li>Hardback books</li></ul></div></div></div>', unsafe_allow_html=True)
                 with tab_grey:
-                    st.markdown('<div style="background-color: #FFFFFF; color: #1E293B; padding: 18px; border-radius: 14px; border: 1px solid #E2E8F0; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.01);"><h4 style="color: #6C757D; margin-top:0; font-size:16px;">🩶 Grey Bin: Mixed Recycling (Plastics & Metals)</h4><div style="display: flex; flex-wrap: wrap; gap: 16px;"><div style="flex: 1; min-width: 200px;"><strong style="color: #16A34A; font-size:14px;">✅ YES:</strong><ul style="font-size: 13px; padding-left: 20px; color: #475569; margin-top:6px;"><li>Plastic bottles, pots, tubs & trays</li><li>Food tins, drink cans & empty aerosols</li><li>Clean aluminium foil & foil trays</li><li>Food and drink cartons (Tetra Pak)</li><li>Soft plastics (Carrier bags, film lids)</li></ul></div><div style="flex: 1; min-width: 200px;"><strong style="color: #DC2626; font-size:14px;">❌ NO:</strong><ul style="font-size: 13px; padding-left: 20px; color: #475569; margin-top:6px;"><li>Glass bottles or jars</li><li>Polystyrene inserts</li><li>Batteries or electronic elements</li><li>Metal pots, cooking pans or trays</li><li>Nappies</li></ul></div></div></div>', unsafe_allow_html=True)
+                    st.markdown('<div style="background-color: #FFFFFF; color: #1E293B; padding: 18px; border-radius: 14px; border: 1px solid #E2E8F0;"><h4 style="color: #6C757D; margin-top:0;">🩶 Mixed Plastics & Tins</h4><div style="display: flex; flex-wrap: wrap; gap: 16px;"><div style="flex: 1; min-width: 200px;"><strong style="color: #16A34A;">✅ YES (Rinse them first!):</strong><ul style="font-size: 13px; padding-left: 20px; color: #475569;"><li>Plastic bottles, pots, tubs & food trays</li><li>Food tins, drink cans & empty aerosols</li><li>Clean aluminium foil packaging sheets</li><li>Juice/milk cartons (Tetra Pak)</li><li>Soft plastics (Carrier bags, film lids)</li></ul></div><div style="flex: 1; min-width: 200px;"><strong style="color: #DC2626;">❌ NO:</strong><ul style="font-size: 13px; padding-left: 20px; color: #475569;"><li>Glass bottles or product jars</li><li>Polystyrene blocks</li><li>Batteries or electronic elements</li><li>Metal pots, cooking pans or baking trays</li><li>Nappies</li></ul></div></div></div>', unsafe_allow_html=True)
                 with tab_brown:
-                    st.markdown('<div style="background-color: #FFFFFF; color: #1E293B; padding: 18px; border-radius: 14px; border: 1px solid #E2E8F0; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.01);"><h4 style="color: #8B4513; margin-top:0; font-size:16px;">🟫 Brown Bin: Garden & Food Waste</h4><div style="display: flex; flex-wrap: wrap; gap: 16px;"><div style="flex: 1; min-width: 200px;"><strong style="color: #16A34A; font-size:14px;">✅ YES:</strong><ul style="font-size: 13px; padding-left: 20px; color: #475569; margin-top:6px;"><li>Grass clippings, leaves & weeds</li><li>Flowers, plants & small branches</li><li>Meat, fish, bones, dairy & eggs</li><li>Fruit, vegetables, bread & pastries</li><li>Tea bags & coffee grounds</li></ul></div><div style="flex: 1; min-width: 200px;"><strong style="color: #DC2626; font-size:14px;">❌ NO:</strong><ul style="font-size: 13px; padding-left: 20px; color: #475569; margin-top:6px;"><li>Plastic bags or standard trash sacks</li><li>Soil, mud, turf, stones or gravel</li><li>Animal waste material or pet bedding</li><li>Japanese Knotweed or Ragwort</li></ul></div></div></div>', unsafe_allow_html=True)
+                    st.markdown('<div style="background-color: #FFFFFF; color: #1E293B; padding: 18px; border-radius: 14px; border: 1px solid #E2E8F0;"><h4 style="color: #8B4513; margin-top:0;">🟫 Leftover Scran & Garden Waste</h4><div style="display: flex; flex-wrap: wrap; gap: 16px;"><div style="flex: 1; min-width: 200px;"><strong style="color: #16A34A;">✅ YES:</strong><ul style="font-size: 13px; padding-left: 20px; color: #475569;"><li>Grass clippings, wild weeds & leaves</li><li>Flowers, small branches & twigs</li><li>Meat, fish, bones, dairy & eggs</li><li>Bread, old pastries, fruit & veg scran</li><li>Tea bags & coffee filter grounds</li></ul></div><div style="flex: 1; min-width: 200px;"><strong style="color: #DC2626;">❌ NO:</strong><ul style="font-size: 13px; padding-left: 20px; color: #475569;"><li>Standard plastic trash bags or sacks</li><li>Heavy soil, mud, turf, stones or gravel</li><li>Animal waste or cat litter sheets</li><li>Invasive Japanese Knotweed or Ragwort</li></ul></div></div></div>', unsafe_allow_html=True)
                 with tab_purple:
-                    st.markdown('<div style="background-color: #FFFFFF; color: #1E293B; padding: 18px; border-radius: 14px; border: 1px solid #E2E8F0; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.01);"><h4 style="color: #6F42C1; margin-top:0; font-size:16px;">🟪 Purple Bin: Glass Recycling</h4><div style="display: flex; flex-wrap: wrap; gap: 16px;"><div style="flex: 1; min-width: 200px;"><strong style="color: #16A34A; font-size:14px;">✅ YES:</strong><ul style="font-size: 13px; padding-left: 20px; color: #475569; margin-top:6px;"><li>Wine & beer bottles</li><li>Spirit & liquor bottles</li><li>Glass food jars (Jam, coffee, sauces)</li><li>Note: Screw lids/caps can be left on</li></ul></div><div style="flex: 1; min-width: 200px;"><strong style="color: #DC2626; font-size:14px;">❌ NO:</strong><ul style="font-size: 13px; padding-left: 20px; color: #475569; margin-top:6px;"><li>Light bulbs or fluorescent tubes</li><li>Drinking glasses, plates or ceramic cups</li><li>Pyrex cookware glass</li><li>Window panes or mirror pieces</li></ul></div></div></div>', unsafe_allow_html=True)
+                    st.markdown('<div style="background-color: #FFFFFF; color: #1E293B; padding: 18px; border-radius: 14px; border: 1px solid #E2E8F0;"><h4 style="color: #6F42C1; margin-top:0;">🟪 Ginger Bottles (Glass Only)</h4><div style="display: flex; flex-wrap: wrap; gap: 16px;"><div style="flex: 1; min-width: 200px;"><strong style="color: #16A34A;">✅ YES:</strong><ul style="font-size: 13px; padding-left: 20px; color: #475569;"><li>Wine, beer & spirit bottles</li><li>Glass cheques / empty Irn-Bru glass</li><li>Glass food jars (Jam, sauce, coffee)</li><li>*Note: Metal screw caps can stay on!*</li></ul></div><div style="flex: 1; min-width: 200px;"><strong style="color: #DC2626;">❌ NO:</strong><ul style="font-size: 13px; padding-left: 20px; color: #475569;"><li>Light bulbs or tubes</li><li>Drinking glasses, dinner plates or ceramic mugs</li><li>Pyrex oven cookware bake glass</li><li>Window panes or mirrors</li></ul></div></div></div>', unsafe_allow_html=True)
+
+                # --- INTERACTIVE MINI-GAME Component: AM I GLAIKIT? ---
+                st.write("")
+                with st.expander("🧠 Quick Check: Am I Glaikit or a Sorting Master?"):
+                    st.write("Where does an empty, grease-stained pizza box belong?")
+                    choice = st.radio("Pick your answer:", ["Blue Bin (It's cardboard!)", "Green Bin (The grease ruined it!)"])
+                    if st.button("Check Verdict"):
+                        if "Green" in choice:
+                            st.success("👑 Sorting Master! The takeaway grease ruins the paper recycling pulp matrix, so it goes straight in the general trash.")
+                        else:
+                            st.error("❌ Pure Glaikit! Cardboard soaked in cooking grease can't be recycled—the bin men will give you a dirty look if you slip that into the blue box.")
+
+                # --- UTILITY PANELS: MISSED BINS & BULK UPLIFTS ---
+                st.write("")
+                col_missed, col_bulk = st.columns(2)
+                with col_missed:
+                    st.error("🚨 Lorry Missed Your Street?")
+                    st.write("If it is past 7:00 PM on collection day and your bin is still sitting full, you've officially been missed by the crew.")
+                    st.markdown('<a href="https://www.glasgow.gov.uk/missedbincollection" target="_blank"><button style="width:100%; border-radius:10px; border:1px solid #DC2626; padding:8px; color:#DC2626; font-weight:600; background:transparent; cursor:pointer;">Report a Missed Bin Collection →</button></a>', unsafe_allow_html=True)
+                with col_bulk:
+                    st.info("🛋️ Got Heavy Junk or Furniture?")
+                    st.write("Don't leave old mattresses or broken couches dumped out in the common tenement close area—book a bulk extraction.")
+                    st.markdown('<a href="https://www.glasgow.gov.uk/bulkuplift" target="_blank"><button style="width:100%; border-radius:10px; border:1px solid #2563EB; padding:8px; color:#2563EB; font-weight:600; background:transparent; cursor:pointer;">Book an Official Bulk Uplift →</button></a>', unsafe_allow_html=True)
 
                 # --- PHASE 4: ENHANCED PRINTABLE FRIDGE MAGNET PDF EXPORTER ---
                 st.divider()
@@ -360,7 +388,7 @@ if query_uprn and query_address:
                 
                 pdf_scifi = random.choice(SCIFI_PHRASES)
                 if st.button("🖨️ Compile & Format Fridge Magnet PDF Sheets"):
-                    with st.spinner(f"🛸 {pdf_scifi}"):
+                    with st.spinner(f" 🛸 {pdf_scifi}"):
                         try:
                             pdf_bytes = generate_fridge_magnet_pdf(collections, query_address, query_uprn)
                             st.success("PDF Compiled successfully! Download button unlocked below.")
@@ -417,7 +445,7 @@ if query_uprn and query_address:
             st.error(f"Error executing profile lookup: {e}")
             
     st.divider()
-    if st.button("🔄 Unlink Address & Search Again"):
+    if st.button("🔄 Wrong House? Clear it and start again"):
         st.query_params.clear()
         st.session_state.clear()
         st.session_state['example_postcode'] = random.choice(GLASGOW_EXAMPLES)
@@ -433,7 +461,7 @@ else:
     """)
     
     random_placeholder = st.session_state['example_postcode']
-    postcode_input = st.text_input(f"Enter Postcode (e.g., {random_placeholder})").upper().strip()
+    postcode_input = st.text_input("Stick your postcode in here:", value=random_placeholder).upper().strip()
     
     if postcode_input:
         if 'last_postcode' not in st.session_state or st.session_state.get('last_postcode') != postcode_input:
@@ -487,7 +515,7 @@ else:
 
         # --- CONDITION A: THE POSTCODE CONTAINS APARTMENT BLOCKS ---
         if st.session_state.get('blocks_map'):
-            st.info("🏢 This area belongs to an apartment complex. Select your building block first:")
+            st.info("🏢 Aye, that's a tenement or a big block of flats. Pick your close/building first:")
             selected_block = st.selectbox("Select Building Block", list(st.session_state['blocks_map'].keys()))
             
             if st.button("Reveal Flats inside Block 👇"):
@@ -535,7 +563,7 @@ else:
             if st.session_state.get('expanded_flats_map'):
                 selected_flat = st.selectbox("Select Your Exact Flat / Door Number", list(st.session_state['expanded_flats_map'].keys()))
                 
-                if st.button("Lock Flat & Generate Dashboard 🚀"):
+                if st.button("Gie's Ma Schedule! 🚀"):
                     target_select_id = st.session_state['expanded_flats_map'][selected_flat]
                     target_expand_id = st.session_state.get('active_expand_id')
                     phrases = random.sample(SCIFI_PHRASES, 3)
@@ -575,7 +603,7 @@ else:
         elif st.session_state.get('direct_map'):
             selected_address = st.selectbox("Select your exact address", list(st.session_state['direct_map'].keys()))
             
-            if st.button("Lock Address & Generate Dashboard 🚀"):
+            if st.button("Gie's Ma Schedule! 🚀"):
                 target_element_id = st.session_state['direct_map'][selected_address]
                 phrases = random.sample(SCIFI_PHRASES, 3)
                 status_box = st.empty()
