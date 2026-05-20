@@ -238,6 +238,19 @@ if query_uprn and query_address:
     st.title("Your Bin Schedule 🚛")
     st.success(f"📍 **Live Profile Linked:** {query_address}")
     
+    # DYNAMIC OFFICIAL COUNCIL LINK (NEW)
+    council_url = f"{BASE_URL}CollectionsCalendar.aspx?UPRN={query_uprn}"
+    st.markdown(
+        f"""
+        <div style="margin-top: -10px; margin-bottom: 20px; font-size: 14px;">
+            🌐 <a href="{council_url}" target="_blank" style="color: #2563EB; font-weight: 600; text-decoration: none;">
+                View official Glasgow City Council web page for this address →
+            </a>
+        </div>
+        """, 
+        unsafe_allow_html=True
+    )
+    
     with st.spinner(f"🌀 {random.choice(SCIFI_PHRASES)}"):
         try:
             calendar_html = fetch_live_calendar_html(query_uprn)
