@@ -33,6 +33,30 @@ BIN_STYLES = {
     "Blue Bin": {"icon": "🟦", "color": "#007BFF"}
 }
 
+# High-flavor local text layouts for digital phone notification parameters
+LOCAL_ICS_DETAILS = {
+    "Green Bin": {
+        "summary": "🟩 Manky Stuff (General Waste) Day!",
+        "desc": "Time to drag the general waste out to the pavement. Get the nappies, pet mess, and greasy rubbish shifted before the lorry flies past your close!"
+    },
+    "Brown Bin": {
+        "summary": "🟫 Leftover Scran & Garden Waste!",
+        "desc": "Get your old sausage roll crusts, potato peelings, and hedge cuttings into the brown wheelie and out to the kerb before it stinks out the kitchen!"
+    },
+    "Grey Bin": {
+        "summary": "🩶 Mixed Plastics & Tins Day!",
+        "desc": "Toss in your rinsed plastic pots, tubs, trays, and clean juice cans. Remember: NO carrier bags or film wrappers, don't clog the machinery at Blochairn!"
+    },
+    "Blue Bin": {
+        "summary": "🟦 Clean Paper & Cardboard Day!",
+        "desc": "Gather up your delivery boxes and cereal packs. Keep it loose and click the lid tight—if it fills with Glasgow rain and turns to mush, they won't take it!"
+    },
+    "Purple Bin": {
+        "summary": "🟪 Ginger Bottles & Glass Only!",
+        "desc": "Time to clear out your empty Irn-Bru glass cheques, wine bottles, and sauce jars. Leave the metal screw caps on, don't be daft!"
+    }
+}
+
 # Curated pool of iconic real Glasgow postcodes across different areas
 GLASGOW_EXAMPLES = [
     "G1 1HL",   # George Square / City Centre
@@ -96,140 +120,6 @@ def parse_calendar_text(html):
             except:
                 pass
     return extracted_collections
-
-# --- NATIVE PLAYWRIGHT PDF PRINT GENERATOR ---
-def generate_fridge_magnet_pdf(collections_list, address_label, uprn_label):
-    sorted_data = sorted(collections_list, key=lambda x: x['date'])
-    date_map = {item['type']: item['date'].strftime('%A, %d %B %Y') for item in sorted_data}
-    
-    html_markup = f"""
-    <!DOCTYPE html>
-    <html>
-    <head>
-        <meta charset="UTF-8">
-        <style>
-            @page {{ size: A4; margin: 15mm 12mm; }}
-            body {{ font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; color: #1e293b; margin: 0; padding: 0; font-size: 10pt; line-height: 1.4; }}
-            .header-title {{ text-align: center; margin-bottom: 20px; padding-bottom: 10px; border-bottom: 2px solid #e2e8f0; }}
-            .header-title h1 {{ margin: 0; font-size: 18pt; color: #0f172a; font-weight: 800; }}
-            .header-title p {{ margin: 4px 0 0 0; font-size: 10pt; color: #64748b; }}
-            .magnet-card {{ border: 2px dashed #94a3b8; border-radius: 14px; padding: 20px; margin-bottom: 30px; background-color: #ffffff; page-break-inside: avoid; position: relative; }}
-            .magnet-label {{ position: absolute; top: -10px; left: 20px; background-color: #334155; color: #ffffff; font-size: 7.5pt; font-weight: 700; padding: 2px 10px; border-radius: 20px; text-transform: uppercase; }}
-            .magnet-header {{ margin-bottom: 12px; border-bottom: 1px solid #f1f5f9; padding-bottom: 8px; }}
-            .magnet-header h2 {{ margin: 0; font-size: 12pt; color: #0f172a; }}
-            .magnet-header p {{ margin: 2px 0 0 0; font-size: 8.5pt; color: #64748b; }}
-            .basic-item {{ display: table; width: 100%; margin-bottom: 8px; padding: 8px; border-radius: 8px; border: 1px solid #e2e8f0; background-color: #f8fafc; }}
-            .basic-color-bar {{ display: table-cell; width: 6px; border-radius: 4px; }}
-            .basic-content {{ display: table-cell; padding-left: 10px; vertical-align: middle; }}
-            .basic-name {{ font-size: 10pt; font-weight: 700; color: #0f172a; }}
-            .basic-frequency {{ font-size: 8.5pt; color: #64748b; }}
-            .basic-write-in {{ display: table-cell; width: 45%; vertical-align: middle; text-align: right; font-size: 9pt; font-weight: 700; color: #1e3a8a; padding-right: 5px; }}
-            .matrix-table {{ display: table; width: 100%; border-collapse: collapse; margin-bottom: 12px; border: 1px solid #e2e8f0; border-radius: 8px; overflow: hidden; }}
-            .matrix-row {{ display: table-row; }}
-            .matrix-header-cell {{ display: table-cell; padding: 6px 10px; font-size: 10pt; font-weight: 700; color: #ffffff; }}
-            .matrix-body-row {{ display: table-row; background-color: #ffffff; }}
-            .matrix-cell-yes {{ display: table-cell; width: 50%; padding: 10px; vertical-align: top; border-right: 1px solid #f1f5f9; font-size: 8.5pt; }}
-            .matrix-cell-no {{ display: table-cell; width: 50%; padding: 10px; vertical-align: top; font-size: 8.5pt; }}
-            .list-title-yes {{ color: #16a34a; font-weight: 700; margin-bottom: 4px; font-size: 9pt; }}
-            .list-title-no {{ color: #dc2626; font-weight: 700; margin-bottom: 4px; font-size: 9pt; }}
-            ul.matrix-list {{ margin: 0; padding-left: 14px; color: #334155; }}
-            ul.matrix-list li {{ margin-bottom: 2px; }}
-            .page-break {{ page-break-before: always; }}
-            .magnet-notes {{ margin-top: 12px; border: 1px solid #e2e8f0; background-color: #fafafa; padding: 8px; border-radius: 6px; font-size: 8.5pt; }}
-        </style>
-    </head>
-    <body>
-        <div class="header-title">
-            <h1>Glasgow Kerbside Collection Guide</h1>
-            <p>Live Pre-Populated Fridge Magnet Reference Sheets</p>
-        </div>
-        <div class="magnet-card">
-            <div class="magnet-label">Option 1: Quick Reference Timeline</div>
-            <div class="magnet-header">
-                <h2>Refuse Collection Schedule</h2>
-                <p>📍 Linked Profile: {address_label} | UPRN: {uprn_label}</p>
-            </div>
-            <div class="basic-item">
-                <div class="basic-color-bar" style="background-color: #28A745;"></div>
-                <div class="basic-content"><div class="basic-name">🟩 Green Bin</div><div class="basic-frequency">General Waste & Non-Recyclable Rubbish (Every 21 Days)</div></div>
-                <div class="basic-write-in">Due: {date_map.get('Green Bin', 'Check App')}</div>
-            </div>
-            <div class="basic-item">
-                <div class="basic-color-bar" style="background-color: #8B4513;"></div>
-                <div class="basic-content"><div class="basic-name">🟫 Brown Bin</div><div class="basic-frequency">Food Waste & Organic Garden Material (Every 14 Days)</div></div>
-                <div class="basic-write-in">Due: {date_map.get('Brown Bin', 'Check App')}</div>
-            </div>
-            <div class="basic-item">
-                <div class="basic-color-bar" style="background-color: #007BFF;"></div>
-                <div class="basic-content"><div class="basic-name">🟦 Blue Bin</div><div class="basic-frequency">Paper, Cardboard & Dry Clean Fiber Packaging (Every 28 Days)</div></div>
-                <div class="basic-write-in">Due: {date_map.get('Blue Bin', 'Check App')}</div>
-            </div>
-            <div class="basic-item">
-                <div class="basic-color-bar" style="background-color: #6C757D;"></div>
-                <div class="basic-content"><div class="basic-name">🩶 Grey Bin</div><div class="basic-frequency">Mixed Recycling (Plastics, Metals & Cartons) (Every 28 Days)</div></div>
-                <div class="basic-write-in">Due: {date_map.get('Grey Bin', 'Check App')}</div>
-            </div>
-            <div class="basic-item">
-                <div class="basic-color-bar" style="background-color: #6F42C1;"></div>
-                <div class="basic-content"><div class="basic-name">🟪 Purple Bin</div><div class="basic-frequency">Glass Bottles & Product Jars Only (Every 56 Days)</div></div>
-                <div class="basic-write-in">Due: {date_map.get('Purple Bin', 'Check App')}</div>
-            </div>
-        </div>
-
-        <div class="page-break"></div>
-        <div class="header-title">
-            <h1>Glasgow Waste Sorting Matrix</h1>
-            <p>Enhanced Household Recycling Cheat Sheet</p>
-        </div>
-        <div class="magnet-card">
-            <div class="magnet-label">Option 2: Comprehensive Sorting Guide</div>
-            <div class="matrix-table">
-                <div class="matrix-row"><div class="matrix-header-cell" style="background-color: #28A745;">🟩 GREEN BIN — General Waste (Non-Recyclable)</div></div>
-                <div class="matrix-body-row">
-                    <div class="matrix-cell-yes"><div class="list-title-yes">✅ YES:</div><ul class="matrix-list"><li>Disposable nappies & wipes</li><li>Pet waste & soiled litter</li><li>Polystyrene & bubble wrap</li><li>Tissues & paper towels</li></ul></div>
-                    <div class="matrix-cell-no"><div class="list-title-no">❌ NO:</div><ul class="matrix-list"><li>Standard dry recyclables</li><li>Electrical items & cables</li><li>Batteries (Fire risk)</li><li>Soil, rubble or stones</li></ul></div>
-                </div>
-            </div>
-            <div class="matrix-table">
-                <div class="matrix-row"><div class="matrix-header-cell" style="background-color: #007BFF;">🟦 BLUE BIN — Paper & Cardboard Recycling</div></div>
-                <div class="matrix-body-row">
-                    <div class="matrix-cell-yes"><div class="list-title-yes">✅ YES (LOOSE ONLY):</div><ul class="matrix-list"><li>Newspapers & magazines</li><li>Envelopes (with or without plastic windows)</li><li>Cardboard packs & boxes</li><li>Clean pizza boxes & egg cartons</li></ul></div>
-                    <div class="matrix-cell-no"><div class="list-title-no">❌ NO:</div><ul class="matrix-list"><li>Plastic bags or wrapping films</li><li>Items with food or liquids</li><li>Shredded paper (confetti size)</li><li>Disposable coffee cups</li></ul></div>
-                </div>
-            </div>
-            <div class="matrix-table">
-                <div class="matrix-row"><div class="matrix-header-cell" style="background-color: #6C757D;">🩶 GREY BIN — Mixed Recycling (Plastics & Metals)</div></div>
-                <div class="matrix-body-row">
-                    <div class="matrix-cell-yes"><div class="list-title-yes">✅ YES (RINSED CLEAN):</div><ul class="matrix-list"><li>Plastic bottles, pots, tubs & trays</li><li>Food tins & drink cans</li><li>Aluminium foil & clean trays</li><li>Food cartons (Tetra Pak)</li></ul></div>
-                    <div class="matrix-cell-no"><div class="list-title-no">❌ NO:</div><ul class="matrix-list"><li>Glass bottles or jars</li><li>Polystyrene inserts</li><li>Soft plastics, shopping bags, or wrappers</li><li>Metal cooking pots or pans</li></ul></div>
-                </div>
-            </div>
-            <div class="matrix-table">
-                <div class="matrix-row"><div class="matrix-header-cell" style="background-color: #8B4513;">🟫 BROWN BIN — Organic Food & Garden Waste</div></div>
-                <div class="matrix-body-row">
-                    <div class="matrix-cell-yes"><div class="list-title-yes">✅ YES:</div><ul class="matrix-list"><li>Grass, leaves & cut weeds</li><li>Flowers, plants & small twigs</li><li>Meat, fish, bones & dairy</li><li>Bread, pastries, fruit & veg</li></ul></div>
-                    <div class="matrix-cell-no"><div class="list-title-no">❌ NO:</div><ul class="matrix-list"><li>Plastic trash sacks or liners</li><li>Soil, turf, stones or gravel</li><li>Animal waste or cat litter</li><li>Japanese Knotweed or Ragwort</li></ul></div>
-                </div>
-            </div>
-            <div class="matrix-table">
-                <div class="matrix-row"><div class="matrix-header-cell" style="background-color: #6F42C1;">🟪 PURPLE BIN — Glass Container Recycling</div></div>
-                <div class="matrix-body-row">
-                    <div class="matrix-cell-yes"><div class="list-title-yes">✅ YES:</div><ul class="matrix-list"><li>Wine & beer bottles</li><li>Spirit & liquor bottles</li><li>Glass jars (Jam, coffee, sauces)</li><li>Note: Screw caps can stay on</li></ul></div>
-                    <div class="matrix-cell-no"><div class="list-title-no">❌ NO:</div><ul class="matrix-list"><li>Light bulbs or fluorescent tubes</li><li>Drinking glasses or ceramic mugs</li><li>Pyrex oven cookware glass</li><li>Window panes or mirrors</li></ul></div>
-                </div>
-            </div>
-        </div>
-    </body>
-    </html>
-    """
-    
-    with sync_playwright() as p:
-        browser = p.chromium.launch(headless=True)
-        page = browser.new_page()
-        page.set_content(html_markup)
-        pdf_raw_bytes = page.pdf(format="A4", print_background=True)
-        browser.close()
-    return pdf_raw_bytes
 
 # --- ROUTING ENGINE ---
 query_uprn = st.query_params.get("uprn")
@@ -557,28 +447,7 @@ if query_uprn and query_address:
                     st.write("Don't leave old mattresses or broken couches dumped out in the common tenement close area—book a bulk extraction.")
                     st.markdown('<a href="https://www.glasgow.gov.uk/bulkuplift" target="_blank"><button style="width:100%; border-radius:10px; border:1px solid #2563EB; padding:8px; color:#2563EB; font-weight:600; background:transparent; cursor:pointer;">Book an Official Bulk Uplift →</button></a>', unsafe_allow_html=True)
 
-                # --- PHASE 4: ENHANCED PRINTABLE FRIDGE MAGNET PDF EXPORTER ---
-                st.divider()
-                st.markdown("### 🖨️ Printable Fridge Magnet Generator")
-                st.write("Compile a high-contrast, printer-friendly PDF vector sheet containing your exact schedule timeline and full recycling cheat sheets.")
-                
-                pdf_scifi = random.choice(SCIFI_PHRASES)
-                if st.button("🖨️ Compile & Format Fridge Magnet PDF Sheets"):
-                    with st.spinner(f" 🛸 {pdf_scifi}"):
-                        try:
-                            pdf_bytes = generate_fridge_magnet_pdf(collections, query_address, query_uprn)
-                            st.success("PDF Compiled successfully! Download button unlocked below.")
-                            st.download_button(
-                                label="📥 Download Fridge Magnet Printouts (.pdf)",
-                                data=pdf_bytes,
-                                file_name=f"fridge_magnets_{query_uprn}.pdf",
-                                mime="application/pdf",
-                                use_container_width=True
-                            )
-                        except Exception as pdf_err:
-                            st.error(f"Failed compiling document vector layouts: {pdf_err}")
-
-                # --- PHASE 5: DIGITAL CALENDAR EXPORT UTILITY ---
+                # --- PHASE 4: HIGH-FLAVOR DIGITAL CALENDAR EXPORT UTILITY ---
                 st.divider()
                 st.write("### 📅 Export to Your Phone Calendar")
                 st.warning("⚠️ **Festive Shambles Warning:** Look, we all know the council loves to do things on the fly when Christmas and New Year roll around. If a collection lands on a bank holiday, they\'ll cancel it entirely or shift it completely without bothering to update their automated online calendar. This means while this digital export stays completely static doing the regular math, the real-world bin lorry is likely nowhere to be seen. If your phone calendar claims they\'re rocking up on Boxing Day, the internet is pure giein it laldy with the lies. Make sure to check back on the live dashboard on your phone during festive week before you drag your bins out for nothing!")
@@ -593,19 +462,19 @@ if query_uprn and query_address:
                     bin_type = item['type']
                     current_date = item['date']
                     cycle_days = intervals.get(bin_type, 14)
-                    style = BIN_STYLES.get(bin_type, {"icon": "🗑️"})
+                    local_info = LOCAL_ICS_DETAILS.get(bin_type, {"summary": f"🗑️ Glasgow {bin_type} Collection", "desc": "Time to put your wheelie out."})
                     
                     while current_date <= end_date:
                         is_festive_week = (current_date.month == 12 and current_date.day >= 20) or (current_date.month == 1 and current_date.day <= 5)
-                        title_prefix = "🎄 [Holiday Shift Check] " if is_festive_week else ""
-                        event_summary = f"{title_prefix}{style['icon']} Glasgow {bin_type} Collection"
+                        title_prefix = "🎄 [Holiday Shambles Check] " if is_festive_week else ""
+                        event_summary = f"{title_prefix}{local_info['summary']}"
                         
                         ics_lines.extend([
                             "BEGIN:VEVENT",
                             f"SUMMARY:{event_summary}",
                             f"DTSTART;VALUE=DATE:{current_date.strftime('%Y%m%d')}",
                             f"DTEND;VALUE=DATE:{(current_date + timedelta(days=1)).strftime('%Y%m%d')}",
-                            f"DESCRIPTION:Time to put your official {bin_type} out. Note: If this lands on festive week, verify the live app dashboard for holiday adjustments.",
+                            f"DESCRIPTION:{local_info['desc']} Note: The council doesn\'t talk to the internet during holiday closures, so if it\'s late December, verify the dashboard url link manually before moving your track containers!",
                             "STATUS:CONFIRMED",
                             "BEGIN:VALARM", "ACTION:DISPLAY", "DESCRIPTION:Bin Reminder", "TRIGGER:-PT12H", "END:VALARM",
                             "END:VEVENT"
