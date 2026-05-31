@@ -261,7 +261,7 @@ if query_uprn and query_address:
 
                 st.markdown(f'<div style="padding: 24px; border-left: 10px solid {primary_color}; border-top: {hero_border}; border-right: {hero_border}; border-bottom: {hero_border}; background: {hero_bg}; border-radius: 16px; margin-bottom: 24px; box-shadow: 0 10px 25px -5px rgba(0,0,0,0.03), 0 8px 10px -6px rgba(0,0,0,0.03);"><span style="font-size: 11px; font-weight: 800; color: #64748B; letter-spacing: 1.5px; text-transform: uppercase;">Urgent: Next Collection Target</span><p style="margin: 4px 0 16px 0; font-size: 16px; font-weight: 700; color: #334155;">{hero_time}</p>{bins_html}</div>', unsafe_allow_html=True)
                 
-                # --- UPGRADED MATRIX SCHEDULE CONTAINER (Grouped & Sorted by Bin Color) ---
+                # --- MATRIX SCHEDULE CONTAINER (Grouped & Sorted by Bin Color) ---
                 st.markdown("### 🗓️ Upcoming Schedule Matrix")
                 st.write("Every bin category organized comprehensively by track—ensuring long-cycle routes like the Purple bin never stay hidden.")
                 
@@ -270,8 +270,16 @@ if query_uprn and query_address:
                 for item in collections:
                     categorized_schedules[item['type']].append(item['date'])
                 
+                intervals = {"Green Bin": 21, "Brown Bin": 14, "Grey Bin": 28, "Purple Bin": 56, "Blue Bin": 28}
+                
                 for bin_name, style in BIN_STYLES.items():
                     dates_pool = sorted(list(set(categorized_schedules[bin_name])))
+                    
+                    # --- PATCH: If council only provides 1 entry, project the second one using official intervals ---
+                    if dates_pool:
+                        cycle_days = intervals.get(bin_name, 14)
+                        while len(dates_pool) < 2:
+                            dates_pool.append(dates_pool[-1] + timedelta(days=cycle_days))
                     
                     # Layout card wrapper container markup
                     card_html = f"""
@@ -285,7 +293,8 @@ if query_uprn and query_address:
                     
                     if dates_pool:
                         badges_html = '<div style="display: flex; gap: 8px; flex-wrap: wrap;">'
-                        for idx, target_date in enumerate(dates_pool[:3]): # Extracts next up to 3 occurrences
+                        # Slice set strictly to [:2] to extract exactly the next 2 occurrences
+                        for idx, target_date in enumerate(dates_pool[:2]): 
                             days_left = (target_date - today).days
                             
                             if days_left == 0:
