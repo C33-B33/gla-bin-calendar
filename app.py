@@ -11,30 +11,15 @@ def install_browser_dependencies():
 install_browser_dependencies()
 
 from playwright.sync_api import sync_playwright
-from bs4 import BeautifulSoup
 import re
 from datetime import datetime, timedelta
 
-# The absolute kitchen sink CSS override to attempt nuking the cloud badge
+# Hide default Streamlit developer chrome (hamburger menu and footer)
 st.markdown("""
     <style>
-    #MainMenu {visibility: hidden !important;}
-    footer {visibility: hidden !important;}
-    header {visibility: hidden !important;}
-    div[data-testid="stDecoration"] {display: none !important;}
-    div[data-testid="stStatusWidget"] {display: none !important;}
-    
-    /* Target variations of the viewer badge element names */
-    div[class^="viewerBadge"] {display: none !important; visibility: hidden !important;}
-    span[class^="viewerBadge"] {display: none !important; visibility: hidden !important;}
-    button[class^="viewerBadge"] {display: none !important; visibility: hidden !important;}
-    
-    /* Target potential iframe cloud injections */
-    iframe[title="Managed Hosting Badge"] {display: none !important; visibility: hidden !important;}
-    iframe[src*="streamlit.io"] {display: none !important;}
-    
-    /* Target link fallbacks */
-    a[href*="streamlit.io"] {display: none !important; visibility: hidden !important;}
+    #MainMenu {visibility: hidden;}
+    footer {visibility: hidden;}
+    header {visibility: hidden;}
     </style>
 """, unsafe_allow_html=True)
 
@@ -116,23 +101,61 @@ def fetch_live_calendar_html(uprn):
         browser.close()
     return html_content
 
+# --- DUAL-LAYER CALENDAR PARSER PATCH ---
 def parse_calendar_text(html):
-    soup = BeautifulSoup(html, "html.parser")
-    full_page_text = " ".join(soup.get_text().split())
     extracted_collections = []
     
+    # Pass 1: Sentence Scanning (Original fallback)
+    clean_html_text = re.sub(r'<[^>]+>', ' ', html)
+    normalized_text = " ".join(clean_html_text.split())
+    
     for bin_name in BIN_STYLES.keys():
-        pattern = rf"Your next {re.escape(bin_name)} day is ([A-Za-z]+ \d{{1,2}}(?:st|nd|rd|th)? [A-Za-z]+ \d{{4}})"
-        match = re.search(pattern, full_page_text)
-        
+        color_prefix = bin_name.split()[0]
+        pattern = rf"Your next {re.escape(color_prefix)}\s+bin\s+(?:collection\s+)?day\s+is\s+([A-Za-z]+\s+\d{{1,2}}(?:st|nd|rd|th)?\s+[A-Za-z]+\s+\d{{4}})"
+        match = re.search(pattern, normalized_text, re.IGNORECASE)
         if match:
             raw_date_text = match.group(1)
             clean_date_text = re.sub(r'(\d+)(st|nd|rd|th)', r'\1', raw_date_text)
-            try:
-                parsed_date = datetime.strptime(clean_date_text, "%A %d %B %Y").date()
-                extracted_collections.append({"type": bin_name, "date": parsed_date})
-            except:
-                pass
+            for fmt in ("%A %d %B %Y", "%d %B %Y"):
+                try:
+                    parsed_date = datetime.strptime(clean_date_text, fmt).date()
+                    if not any(c["type"] == bin_name and c["date"] == parsed_date for c in extracted_collections):
+                        extracted_collections.append({"type": bin_name, "date": parsed_date})
+                    break
+                except:
+                    pass
+
+    # Pass 2: Month Grid Table Cell Extraction (Captures Purple Bin completely)
+    table_blocks = re.split(r'<table[^>]*>', html, flags=re.IGNORECASE)
+    
+    for block in table_blocks[1:]:
+        header_match = re.search(r'(January|February|March|April|May|June|July|August|September|October|November|December)\s+(\d{4})', block, re.IGNORECASE)
+        if not header_match:
+            continue
+            
+        month_name = header_match.group(1)
+        year_str = header_match.group(2)
+        
+        cell_matches = re.findall(r'<td[^>]*>(.*?)</td>', block, re.DOTALL | re.IGNORECASE)
+        for cell_content in cell_matches:
+            clean_cell_text = re.sub(r'<[^>]+>', ' ', cell_content)
+            img_attrs = re.findall(r'(?:alt|title)\s*=\s*["\']([^"\']+)["\']', cell_content, re.IGNORECASE)
+            full_cell_search_string = clean_cell_text + " " + " ".join(img_attrs)
+            
+            for bin_name in BIN_STYLES.keys():
+                color_prefix = bin_name.split()[0]
+                if color_prefix.lower() in full_cell_search_string.lower():
+                    day_match = re.search(r'\b(\d{1,2})\b', clean_cell_text)
+                    if day_match:
+                        day_num = int(day_match.group(1))
+                        try:
+                            date_str = f"{day_num} {month_name} {year_str}"
+                            parsed_date = datetime.strptime(date_str, "%d %B %Y").date()
+                            if not any(c["type"] == bin_name and c["date"] == parsed_date for c in extracted_collections):
+                                extracted_collections.append({"type": bin_name, "date": parsed_date})
+                        except:
+                            pass
+                            
     return extracted_collections
 
 # --- ROUTING ENGINE ---
@@ -248,10 +271,8 @@ if query_uprn and query_address:
                 # NATIVE LIVE GCC COMPLIANCE DISCLAIMER SHIELD
                 st.warning(
                     "⚠️ **The 'Council Likes To Change Its Mind' Disclaimer:** Look, the big wigs at George Square "
-                    "love to shift the recycling rules almost as often as the Glasgow weather changes. While this cheat sheet "
-                    "is tracking the latest rules for the new Grey Bin rollout and Blue Paper tracks, the machinery at the processing "
-                    "plant gets updated all the time. To save yourself from getting a red 'sticker of shame' slapped onto your bin lid "
-                    "by a grumpy collection crew, double-check the absolute live source criteria here: "
+                    "love to shift the recycling rules almost as often as the Glasgow weather changes. To save yourself from getting a red 'sticker of shame' "
+                    "slapped onto your bin lid by a grumpy collection crew, double-check the absolute live source criteria here: "
                     "[Official Glasgow City Council Bin Sorting Guidelines](https://www.glasgow.gov.uk/article/13729/What-goes-in-your-bin)"
                 )
                 
@@ -268,9 +289,9 @@ if query_uprn and query_address:
                 with tab_brown:
                     st.markdown('<div style="background-color: #FFFFFF; color: #1E293B; padding: 18px; border-radius: 14px; border: 1px solid #E2E8F0;"><h4 style="color: #8B4513; margin-top:0;">🟫 Leftover Scran & Garden Waste</h4><div style="display: flex; flex-wrap: wrap; gap: 16px;"><div style="flex: 1; min-width: 200px;"><strong style="color: #16A34A;">✅ YES:</strong><ul style="font-size: 13px; padding-left: 20px; color: #475569;"><li>Grass clippings, wild weeds & leaves</li><li>Flowers, small branches & twigs</li><li>Meat, fish, bones, dairy & eggs</li><li>Bread, old pastries, fruit & veg scran</li><li>Tea bags & coffee filter grounds</li></ul></div><div style="flex: 1; min-width: 200px;"><strong style="color: #DC2626;">❌ NO:</strong><ul style="font-size: 13px; padding-left: 20px; color: #475569;"><li>Standard plastic trash bags or sacks</li><li>Heavy soil, mud, turf, stones or gravel</li><li>Animal waste or cat litter sheets</li><li>Invasive Japanese Knotweed or Ragwort</li></ul></div></div></div>', unsafe_allow_html=True)
                 with tab_purple:
-                    st.markdown('<div style="background-color: #FFFFFF; color: #1E293B; padding: 18px; border-radius: 14px; border: 1px solid #E2E8F0;"><h4 style="color: #6F42C1; margin-top:0;">🟪 Ginger Bottles (Glass Only)</h4><div style="display: flex; flex-wrap: wrap; gap: 16px;"><div style="flex: 1; min-width: 200px;"><strong style="color: #16A34A;">✅ YES:</strong><ul style="font-size: 13px; padding-left: 20px; color: #475569;"><li>Wine, beer & spirit bottles</li><li>Glass cheques / empty Irn-Bru glass</li><li>Glass food jars (Jam, sauce, coffee)</li><li>*Note: Metal screw caps can stay on, don\'t be daft!*</li></ul></div><div style="flex: 1; min-width: 200px;"><strong style="color: #DC2626;">❌ NO:</strong><ul style="font-size: 13px; padding-left: 20px; color: #475569;"><li>Light bulbs or tubes</li><li>Drinking glasses, dinner plates or ceramic mugs</li><li>Pyrex oven cookware bake glass</li><li>Window panes or mirrors</li></ul></div></div></div>', unsafe_allow_html=True)
+                    st.markdown('<div style="background-color: #FFFFFF; color: #1E293B; padding: 18px; border-radius: 14px; border: 1px solid #E2E8F0;"><h4 style="color: #6F42C1; margin-top:0;">🟪 Ginger Bottles (Glass Only)</h4><div style="display: flex; flex-wrap: wrap; gap: 16px;"><div style="flex: 1; min-width: 200px;"><strong style="color: #16A34A;">✅ YES:</strong><ul style="font-size: 13px; padding-left: 20px; color: #475569;"><li>Wine, beer & spirit bottles</li><li>Glass cheques / empty Irn-Bru glass</li><li>Glass food jars (Jam, sauce, coffee)</li><li>*Note: Metal screw caps can stay on, don\'t be daft!*</li></ul></div><div style="flex: 1; min-width: 200px;"><strong style="color: #DC2626;">❌ NO:</strong><ul style="font-size: 13px; padding-left: 20px; color: #475569;"><li>Light bulbs or tubes</li><li>Drinking glasses, dinner plates or ceramic mugs</li><li>Pyrex cookware bake glass</li><li>Window panes or mirrors</li></ul></div></div></div>', unsafe_allow_html=True)
 
-                # --- INTERACTIVE QUIZ SHUFFLER: AM I GLAIKIT? ---
+                # --- UPGRADED INTERACTIVE 20-QUESTION EXAM ENGINE ---
                 st.write("")
                 with st.expander("🧠 The Great Glaswegian Recycling Exam: Am I Glaikit?"):
                     st.write("Test your wits against the trickiest traps in the city chambers. 3 random questions from our massive item bank—let's see if you're an absolute expert or a melt.")
@@ -513,7 +534,7 @@ if query_uprn and query_address:
 # --- VIEW B: THE INITIAL SETUP PORTAL ---
 else:
     st.title("Pure Brilliant Bin Finder 🏴󠁧󠁢󠁳󠁣󠁴󠁿")
-    st.caption("🚛 *A dedicated, set-and-forget tracker exclusively for Glasgow City residents.*")
+    st.caption("🚛 *A dedicated, set-and-forget tracker built exclusively for Glasgow City residents.*")
     st.markdown("""
     Tired of peeking out the window at midnight to see which color bins the neighbors have dragged to the kerb? Drop your postcode below **one single time**, pick your exact door, and you're set. 
     
@@ -521,7 +542,6 @@ else:
     """)
     
     random_placeholder = st.session_state['example_postcode']
-    # FIX: Changed 'value=' to 'placeholder=' so it stays empty on load
     postcode_input = st.text_input("Stick your postcode in here:", placeholder=random_placeholder).upper().strip()
     
     if postcode_input:
