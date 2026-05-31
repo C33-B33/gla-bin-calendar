@@ -132,7 +132,6 @@ def parse_calendar_text(html):
                     except:
                         pass
             
-            # Filter: Only keep upcoming or active collections
             if parsed_date and parsed_date >= machine_today:
                 if not any(c["type"] == bin_name and c["date"] == parsed_date for c in extracted_collections):
                     extracted_collections.append({"type": bin_name, "date": parsed_date})
@@ -167,7 +166,6 @@ def parse_calendar_text(html):
                             date_str = f"{day_num} {month_name} {year_str}"
                             parsed_date = datetime.strptime(date_str, "%d %B %Y").date()
                             
-                            # Filter: Drop past grid items to stop old entries polluting the deck
                             if parsed_date >= machine_today:
                                 if not any(c["type"] == bin_name and c["date"] == parsed_date for c in extracted_collections):
                                     extracted_collections.append({"type": bin_name, "date": parsed_date})
@@ -200,8 +198,6 @@ if query_uprn and query_address:
 
     st.markdown("""
     Magic. Your specific address token is officially locked into the dashboard matrix. Make sure to **bookmark this exact web address right now** on your phone or laptop. That way, you can bypass the setup screens entirely and jump straight to your live dates whenever you visit.
-    
-    Now that we've sidestepped the council's maze, here are your pure brilliant tools to make sure you never miss a collection deadline again:
     """)
     
     with st.spinner(f"🌀 {random.choice(SCIFI_PHRASES)}"):
@@ -237,10 +233,9 @@ if query_uprn and query_address:
                 sorted_collections = sorted(collections, key=lambda x: x['date'])
                 today = datetime.now().date()
                 
+                # --- HERO CONTAINER (Immediate Next Collection Deadline) ---
                 closest_date = sorted_collections[0]['date']
                 hero_items = [item for item in sorted_collections if item['date'] == closest_date]
-                future_bins = [item for item in sorted_collections if item['date'] > closest_date]
-                
                 hero_days = (closest_date - today).days
                 
                 if hero_days == 0:
@@ -264,22 +259,57 @@ if query_uprn and query_address:
 
                 primary_color = BIN_STYLES.get(hero_items[0]['type'], {"color": "#475569"})["color"]
 
-                st.markdown(f'<div style="padding: 24px; border-left: 10px solid {primary_color}; border-top: {hero_border}; border-right: {hero_border}; border-bottom: {hero_border}; background: {hero_bg}; border-radius: 16px; margin-bottom: 24px; box-shadow: 0 10px 25px -5px rgba(0,0,0,0.03), 0 8px 10px -6px rgba(0,0,0,0.03);"><span style="font-size: 11px; font-weight: 800; color: #64748B; letter-spacing: 1.5px; text-transform: uppercase;">Next Collection Day</span><p style="margin: 4px 0 16px 0; font-size: 16px; font-weight: 700; color: #334155;">{hero_time}</p>{bins_html}</div>', unsafe_allow_html=True)
+                st.markdown(f'<div style="padding: 24px; border-left: 10px solid {primary_color}; border-top: {hero_border}; border-right: {hero_border}; border-bottom: {hero_border}; background: {hero_bg}; border-radius: 16px; margin-bottom: 24px; box-shadow: 0 10px 25px -5px rgba(0,0,0,0.03), 0 8px 10px -6px rgba(0,0,0,0.03);"><span style="font-size: 11px; font-weight: 800; color: #64748B; letter-spacing: 1.5px; text-transform: uppercase;">Urgent: Next Collection Target</span><p style="margin: 4px 0 16px 0; font-size: 16px; font-weight: 700; color: #334155;">{hero_time}</p>{bins_html}</div>', unsafe_allow_html=True)
                 
-                if future_bins:
-                    st.markdown("### 🗓️ Following Schedule")
-                    col1, col2 = st.columns(2)
+                # --- UPGRADED MATRIX SCHEDULE CONTAINER (Grouped & Sorted by Bin Color) ---
+                st.markdown("### 🗓️ Upcoming Schedule Matrix")
+                st.write("Every bin category organized comprehensively by track—ensuring long-cycle routes like the Purple bin never stay hidden.")
+                
+                # Group discovered target dates by category type
+                categorized_schedules = {b: [] for b in BIN_STYLES.keys()}
+                for item in collections:
+                    categorized_schedules[item['type']].append(item['date'])
+                
+                for bin_name, style in BIN_STYLES.items():
+                    dates_pool = sorted(list(set(categorized_schedules[bin_name])))
                     
-                    for idx, item in enumerate(future_bins):
-                        days_away = (item['date'] - today).days
-                        style = BIN_STYLES.get(item['type'], {"icon": "🗑️", "color": "#333333"})
-                        time_text = f"{item['date'].strftime('%a, %d %b')} ({days_away}d)"
-                        target_col = col1 if idx % 2 == 0 else col2
+                    # Layout card wrapper container markup
+                    card_html = f"""
+                    <div style="padding: 16px; background-color: #FFFFFF; border: 1px solid #E2E8F0; border-radius: 12px; margin-bottom: 12px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.01);">
+                        <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 10px;">
+                            <div style="display: flex; align-items: center;">
+                                <span style="font-size: 24px; margin-right: 12px;">{style['icon']}</span>
+                                <strong style="color: #1E293B; font-size: 16px;">{bin_name}</strong>
+                            </div>
+                    """
+                    
+                    if dates_pool:
+                        badges_html = '<div style="display: flex; gap: 8px; flex-wrap: wrap;">'
+                        for idx, target_date in enumerate(dates_pool[:3]): # Extracts next up to 3 occurrences
+                            days_left = (target_date - today).days
+                            
+                            if days_left == 0:
+                                badge_style = "background-color: #FEF2F2; color: #DC2626; border: 1px solid #FCA5A5; font-weight: 800;"
+                                suffix = " (TODAY!)"
+                            elif days_left == 1:
+                                badge_style = "background-color: #FFFBEB; color: #D97706; border: 1px solid #FCD34D; font-weight: 700;"
+                                suffix = " (Tomorrow)"
+                            else:
+                                badge_style = "background-color: #F8FAFC; color: #475569; border: 1px solid #E2E8F0;"
+                                suffix = f" ({days_left}d)"
+                                
+                            label_prefix = "🎯 Next: " if idx == 0 else "Following: "
+                            badges_html += f'<span style="padding: 6px 12px; border-radius: 8px; font-size: 13px; {badge_style}">{label_prefix}{target_date.strftime("%a, %d %b")}{suffix}</span>'
+                        badges_html += '</div>'
+                        card_html += badges_html
+                    else:
+                        card_html += f'<span style="padding: 6px 12px; background-color: #F1F5F9; color: #94A3B8; border-radius: 8px; font-size: 13px; font-style: italic;">No dates detected in live calendar window</span>'
                         
-                        with target_col:
-                            st.markdown(f'<div style="padding: 16px; border-left: 6px solid {style["color"]}; background-color: #FFFFFF; border-radius: 12px; margin-bottom: 14px; border-top: 1px solid #F1F5F9; border-right: 1px solid #F1F5F9; border-bottom: 1px solid #F1F5F9; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.02), 0 2px 4px -1px rgba(0,0,0,0.02);"><h4 style="margin: 0; color: #1E293B; font-size: 15px; font-weight: 700; letter-spacing: -0.3px;">{style["icon"]} {item["type"].split(" ")[0]} Bin</h4><p style="margin: 6px 0 0 0; font-size: 13px; font-weight: 500; color: #64748B;">{time_text}</p></div>', unsafe_allow_html=True)
+                    card_html += "</div></div>"
+                    st.markdown(card_html, unsafe_allow_html=True)
                 
                 # --- DYNAMIC FEATURE: SOGGY RAIN CLIMATE WARNING ---
+                st.write("")
                 st.info("🌧️ **Glasgow Weather Advisory:** It's absolutely tipping it down outside (standard Tuesday behavior). Make sure your bin lids are clicked shut tight. If your blue recycling bin fills up with rain and turns your cardboard into a soggy paper-mâché porridge, the collection crew will walk right past it.")
 
                 # --- PHASE 3: COUNCIL WASTE CHEAT SHEET MATRIX ---
