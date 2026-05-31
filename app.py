@@ -11,6 +11,7 @@ def install_browser_dependencies():
 install_browser_dependencies()
 
 from playwright.sync_api import sync_playwright
+from bs4 import BeautifulSoup
 import re
 from datetime import datetime, timedelta
 
@@ -101,58 +102,75 @@ def fetch_live_calendar_html(uprn):
         browser.close()
     return html_content
 
-# --- DUAL-LAYER CALENDAR PARSER PATCH ---
+# --- ROBUST DUAL-LAYER PARSING ENGINE WITH HISTORICAL DATE FILTER ---
 def parse_calendar_text(html):
+    soup = BeautifulSoup(html, "html.parser")
     extracted_collections = []
+    machine_today = datetime.now().date()
     
-    # Pass 1: Sentence Scanning (Original fallback)
-    clean_html_text = re.sub(r'<[^>]+>', ' ', html)
-    normalized_text = " ".join(clean_html_text.split())
-    
+    # PASS 1: Parse Text Sentences (Handles dynamic keywords like 'Today' and 'Tomorrow')
+    full_page_text = " ".join(soup.get_text().split())
     for bin_name in BIN_STYLES.keys():
         color_prefix = bin_name.split()[0]
-        pattern = rf"Your next {re.escape(color_prefix)}\s+bin\s+(?:collection\s+)?day\s+is\s+([A-Za-z]+\s+\d{{1,2}}(?:st|nd|rd|th)?\s+[A-Za-z]+\s+\d{{4}})"
-        match = re.search(pattern, normalized_text, re.IGNORECASE)
+        pattern = rf"Your next {re.escape(color_prefix)}\s+bin\s+(?:collection\s+)?day\s+is\s+(\bToday\b|\bTomorrow\b|[A-Za-z]+\s+\d{{1,2}}(?:st|nd|rd|th)?\s+[A-Za-z]+\s+\d{{4}})"
+        match = re.search(pattern, full_page_text, re.IGNORECASE)
+        
         if match:
-            raw_date_text = match.group(1)
-            clean_date_text = re.sub(r'(\d+)(st|nd|rd|th)', r'\1', raw_date_text)
-            for fmt in ("%A %d %B %Y", "%d %B %Y"):
-                try:
-                    parsed_date = datetime.strptime(clean_date_text, fmt).date()
-                    if not any(c["type"] == bin_name and c["date"] == parsed_date for c in extracted_collections):
-                        extracted_collections.append({"type": bin_name, "date": parsed_date})
-                    break
-                except:
-                    pass
+            date_str = match.group(1)
+            parsed_date = None
+            
+            if date_str.lower() == "today":
+                parsed_date = machine_today
+            elif date_str.lower() == "tomorrow":
+                parsed_date = machine_today + timedelta(days=1)
+            else:
+                clean_date_text = re.sub(r'(\d+)(st|nd|rd|th)', r'\1', date_str)
+                for fmt in ("%A %d %B %Y", "%d %B %Y"):
+                    try:
+                        parsed_date = datetime.strptime(clean_date_text, fmt).date()
+                        break
+                    except:
+                        pass
+            
+            # Filter: Only keep upcoming or active collections
+            if parsed_date and parsed_date >= machine_today:
+                if not any(c["type"] == bin_name and c["date"] == parsed_date for c in extracted_collections):
+                    extracted_collections.append({"type": bin_name, "date": parsed_date})
 
-    # Pass 2: Month Grid Table Cell Extraction (Captures Purple Bin completely)
-    table_blocks = re.split(r'<table[^>]*>', html, flags=re.IGNORECASE)
-    
-    for block in table_blocks[1:]:
-        header_match = re.search(r'(January|February|March|April|May|June|July|August|September|October|November|December)\s+(\d{4})', block, re.IGNORECASE)
-        if not header_match:
+    # PASS 2: Extract from Calendar Table Grid (Backup & future rotation mapping)
+    tables = soup.find_all("table")
+    for table in tables:
+        table_text = table.get_text()
+        month_year_match = re.search(r'(January|February|March|April|May|June|July|August|September|October|November|December)\s+(\d{4})', table_text, re.IGNORECASE)
+        if not month_year_match and table.parent:
+            month_year_match = re.search(r'(January|February|March|April|May|June|July|August|September|October|November|December)\s+(\d{4})', table.parent.get_text(), re.IGNORECASE)
+            
+        if not month_year_match:
             continue
             
-        month_name = header_match.group(1)
-        year_str = header_match.group(2)
+        month_name = month_year_match.group(1)
+        year_str = month_year_match.group(2)
         
-        cell_matches = re.findall(r'<td[^>]*>(.*?)</td>', block, re.DOTALL | re.IGNORECASE)
-        for cell_content in cell_matches:
-            clean_cell_text = re.sub(r'<[^>]+>', ' ', cell_content)
-            img_attrs = re.findall(r'(?:alt|title)\s*=\s*["\']([^"\']+)["\']', cell_content, re.IGNORECASE)
-            full_cell_search_string = clean_cell_text + " " + " ".join(img_attrs)
+        cells = table.find_all("td")
+        for cell in cells:
+            cell_text = cell.get_text(separator=" ").strip()
+            for img in cell.find_all("img"):
+                cell_text += " " + img.get("alt", "") + " " + img.get("title", "")
             
             for bin_name in BIN_STYLES.keys():
                 color_prefix = bin_name.split()[0]
-                if color_prefix.lower() in full_cell_search_string.lower():
-                    day_match = re.search(r'\b(\d{1,2})\b', clean_cell_text)
+                if color_prefix.lower() in cell_text.lower():
+                    day_match = re.search(r'\b(\d{1,2})\b', cell.get_text().strip())
                     if day_match:
                         day_num = int(day_match.group(1))
                         try:
                             date_str = f"{day_num} {month_name} {year_str}"
                             parsed_date = datetime.strptime(date_str, "%d %B %Y").date()
-                            if not any(c["type"] == bin_name and c["date"] == parsed_date for c in extracted_collections):
-                                extracted_collections.append({"type": bin_name, "date": parsed_date})
+                            
+                            # Filter: Drop past grid items to stop old entries polluting the deck
+                            if parsed_date >= machine_today:
+                                if not any(c["type"] == bin_name and c["date"] == parsed_date for c in extracted_collections):
+                                    extracted_collections.append({"type": bin_name, "date": parsed_date})
                         except:
                             pass
                             
@@ -291,7 +309,7 @@ if query_uprn and query_address:
                 with tab_purple:
                     st.markdown('<div style="background-color: #FFFFFF; color: #1E293B; padding: 18px; border-radius: 14px; border: 1px solid #E2E8F0;"><h4 style="color: #6F42C1; margin-top:0;">🟪 Ginger Bottles (Glass Only)</h4><div style="display: flex; flex-wrap: wrap; gap: 16px;"><div style="flex: 1; min-width: 200px;"><strong style="color: #16A34A;">✅ YES:</strong><ul style="font-size: 13px; padding-left: 20px; color: #475569;"><li>Wine, beer & spirit bottles</li><li>Glass cheques / empty Irn-Bru glass</li><li>Glass food jars (Jam, sauce, coffee)</li><li>*Note: Metal screw caps can stay on, don\'t be daft!*</li></ul></div><div style="flex: 1; min-width: 200px;"><strong style="color: #DC2626;">❌ NO:</strong><ul style="font-size: 13px; padding-left: 20px; color: #475569;"><li>Light bulbs or tubes</li><li>Drinking glasses, dinner plates or ceramic mugs</li><li>Pyrex cookware bake glass</li><li>Window panes or mirrors</li></ul></div></div></div>', unsafe_allow_html=True)
 
-                # --- UPGRADED INTERACTIVE 20-QUESTION EXAM ENGINE ---
+                # --- INTERACTIVE QUIZ ENGINE ---
                 st.write("")
                 with st.expander("🧠 The Great Glaswegian Recycling Exam: Am I Glaikit?"):
                     st.write("Test your wits against the trickiest traps in the city chambers. 3 random questions from our massive item bank—let's see if you're an absolute expert or a melt.")
